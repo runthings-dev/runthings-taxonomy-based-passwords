@@ -33,7 +33,16 @@ if (!defined('ABSPATH')) {
 
 class Runthings_Taxonomy_Based_Passwords
 {
-    private $objects = ['page', 'grower-news', 'grower-questions', 'farmer-profiles'];
+    /**
+     * Hub object that is the parent of the protected pages
+     */
+    private $hub_object = ['page'];
+    private $hub_object_id = 123;
+
+    /**
+     * Post types to protect
+     */
+    private $objects = ['grower-news', 'grower-questions', 'farmer-profiles'];
 
     public function __construct()
     {
@@ -74,7 +83,9 @@ class Runthings_Taxonomy_Based_Passwords
             'rewrite'           => ['slug' => 'grower-contract'],
         ];
 
-        register_taxonomy('grower_contract', $this->objects, $args);
+        $taxonomy_objects = array_merge($this->objects, $this->hub_object);
+
+        register_taxonomy('grower_contract', $taxonomy_objects, $args);
     }
 
     /**
