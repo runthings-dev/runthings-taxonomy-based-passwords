@@ -27,6 +27,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
+namespace RunThings\TaxonomyBasedPasswords;
+
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
@@ -201,7 +204,7 @@ class Runthings_Taxonomy_Based_Passwords
                         global $wp_hasher;
                         if (empty($wp_hasher)) {
                             require_once ABSPATH . 'wp-includes/class-phpass.php';
-                            $wp_hasher = new PasswordHash(8, true);
+                            $wp_hasher = new \PasswordHash(8, true);
                         }
                         setcookie('wp-postpass_' . COOKIEHASH, $wp_hasher->HashPassword($password), time() + 864000, COOKIEPATH);
                         wp_redirect($return_url);
@@ -227,7 +230,7 @@ class Runthings_Taxonomy_Based_Passwords
         global $post;
 
         // Use a temporary post object to generate the form
-        $temp_post = new stdClass();
+        $temp_post = new \stdClass();
         $temp_post->ID = 0;
         $temp_post->post_password = '';
 
