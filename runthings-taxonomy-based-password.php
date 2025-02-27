@@ -40,6 +40,11 @@ class Runthings_Taxonomy_Based_Passwords
     private $hub_object_id = 123;
 
     /**
+     * Login page
+     */
+    private $login_page_id = 6515;
+
+    /**
      * Post types to protect
      */
     private $objects = ['grower-news', 'grower-questions', 'farmer-profiles'];
@@ -52,7 +57,7 @@ class Runthings_Taxonomy_Based_Passwords
         add_action('save_post', [$this, 'save_grower_contract_meta_box']);
 
         // protection
-        add_action('template_redirect', [$this, 'simple_protection_redirect']);
+        add_action('template_redirect', [$this, 'single_protection']);
     }
 
     /**
@@ -145,22 +150,25 @@ class Runthings_Taxonomy_Based_Passwords
      */
     public function single_protection()
     {
-        // Only check on singular views
         if (!is_singular() || is_admin()) {
             return;
         }
 
         $post_type = get_post_type();
 
-        // For now, skip pages
-        if ($post_type === 'page') {
-            return;
-        }
-
-        // If this is one of our protected post types
         if (in_array($post_type, $this->objects)) {
-            // Simple redirect to homepage for now
-            wp_redirect(home_url());
+            $login_url = get_permalink($this->login_page_id);
+
+            if (!$login_url) {
+                $login_url = home_url();
+            } else {
+                // Add the current URL as a return URL parameter
+                global $wp;
+                $current_url = home_url(add_query_arg([], $wp->request));
+                $login_url = add_query_arg('return', urlencode($current_url), $login_url);
+            }
+
+            wp_redirect($login_url);
             exit;
         }
     }
