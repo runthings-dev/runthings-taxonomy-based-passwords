@@ -58,6 +58,9 @@ class Runthings_Taxonomy_Based_Passwords
 
         // protection
         add_action('template_redirect', [$this, 'single_protection']);
+
+        // shortcode
+        add_shortcode('runthings_taxonomy_login_form', [$this, 'render_login_form']);
     }
 
     /**
@@ -171,6 +174,31 @@ class Runthings_Taxonomy_Based_Passwords
             wp_redirect($login_url);
             exit;
         }
+    }
+
+    /**
+     * Renders the login form using the built-in WordPress password form
+     */
+    public function render_login_form($atts)
+    {
+        global $post;
+
+        // Use a temporary post object to generate the form
+        $temp_post = new stdClass();
+        $temp_post->ID = 0;
+        $temp_post->post_password = '';
+
+        // Generate the password form
+        $form = get_the_password_form($temp_post);
+
+        // Customize the form if needed
+        $form = str_replace(
+            'This content is password protected.',
+            'This content is restricted to contracted growers. Please enter your password to view it.',
+            $form
+        );
+
+        return $form;
     }
 }
 
