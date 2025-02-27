@@ -22,7 +22,7 @@ class Authentication
      */
     public function custom_authenticate($user, $username, $password)
     {
-        if (isset($_POST['custom_form']) && $_POST['custom_form'] === 'runthings_taxonomy_login_form') {
+        if (isset($_POST['runthings_taxonomy_based_password_form']) && $_POST['runthings_taxonomy_based_password_form'] === 'login_form') {
             if (isset($_POST['post_password']) && isset($_POST['return_url'])) {
                 $password = $_POST['post_password'];
                 $return_url = esc_url_raw($_POST['return_url']);
@@ -82,7 +82,7 @@ class Authentication
         if (isset($_GET['return'])) {
             $return_url = esc_url($_GET['return']);
             $hidden_fields = '<input type="hidden" name="return_url" value="' . $return_url . '">';
-            $hidden_fields .= '<input type="hidden" name="custom_form" value="runthings_taxonomy_login_form">';
+            $hidden_fields .= '<input type="hidden" name="runthings_taxonomy_based_password_form" value="login_form">';
             $form = str_replace('</form>', $hidden_fields . '</form>', $form);
         }
 
