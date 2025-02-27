@@ -1,6 +1,6 @@
 <?php
 
-namespace RunThingsTaxonomyBasedPasswords;
+namespace RunThingsTaxonomyBasedPassword;
 
 class Taxonomy
 {
