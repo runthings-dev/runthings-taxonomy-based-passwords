@@ -33,6 +33,8 @@ if (!defined('ABSPATH')) {
 
 class Runthings_Taxonomy_Based_Passwords
 {
+    private $objects = ['page', 'grower-news', 'grower-questions', 'farmer-profiles'];
+
     public function __construct()
     {
         add_action('init', [$this, 'register_grower_contract_taxonomy']);
@@ -68,7 +70,7 @@ class Runthings_Taxonomy_Based_Passwords
             'rewrite'           => ['slug' => 'grower-contract'],
         ];
 
-        register_taxonomy('grower_contract', ['page', 'grower-news', 'grower-questions', 'farmer-profiles'], $args);
+        register_taxonomy('grower_contract', $this->objects, $args);
     }
 
     /**
