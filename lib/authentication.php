@@ -39,10 +39,7 @@ class Authentication
                         wp_redirect($return_url);
                         exit;
                     } else {
-                        // Password is incorrect, redirect back to the login page with an error
-                        $login_url = add_query_arg('error', 'incorrect_password', get_permalink($this->config->login_page_id));
-                        wp_redirect($login_url);
-                        exit;
+                        return new \WP_Error('incorrect_password', __('The password you entered is incorrect.'));
                     }
                 }
             }
