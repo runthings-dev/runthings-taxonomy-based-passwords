@@ -34,13 +34,8 @@ class Authentication
                     $valid_password = !empty($terms) ? $terms[0] : '';
 
                     if ($original_post && $valid_password === $password) {
-                        // Password is correct, set the cookie and redirect to the original post
-                        global $wp_hasher;
-                        if (empty($wp_hasher)) {
-                            require_once ABSPATH . 'wp-includes/class-phpass.php';
-                            $wp_hasher = new \PasswordHash(8, true);
-                        }
-                        setcookie('wp-postpass_' . COOKIEHASH, $wp_hasher->HashPassword($password), time() + 864000, COOKIEPATH);
+                        // Password is correct
+                        $this->set_cookie($password, 123);
                         wp_redirect($return_url);
                         exit;
                     } else {
@@ -87,5 +82,21 @@ class Authentication
         }
 
         return $form;
+    }
+
+    /**
+     * Set the cookie object
+     */
+    private function set_cookie($password, $term_id)
+    {
+        global $wp_hasher;
+        if (empty($wp_hasher)) {
+            require_once ABSPATH . 'wp-includes/class-phpass.php';
+            $wp_hasher = new \PasswordHash(8, true);
+        }
+        $hashed_password = $wp_hasher->HashPassword($password);
+        $cookie_name = 'runthings_taxonomy_based_password' . COOKIEHASH;
+        $cookie_value = json_encode(['term_id' => $term_id, 'password' => $hashed_password]);
+        setcookie($cookie_name, $cookie_value, time() + 864000, COOKIEPATH);
     }
 }
