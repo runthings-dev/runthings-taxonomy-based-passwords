@@ -162,13 +162,14 @@ class Runthings_Taxonomy_Based_Passwords
         if (in_array($post_type, $this->objects)) {
             $login_url = get_permalink($this->login_page_id);
 
-            if (!$login_url) {
-                $login_url = home_url();
-            } else {
+            if ($login_url) {
                 // Add the current URL as a return URL parameter
                 global $wp;
                 $current_url = home_url(add_query_arg([], $wp->request));
                 $login_url = add_query_arg('return', urlencode($current_url), $login_url);
+            } else {
+                // Fallback url
+                $login_url = home_url();
             }
 
             wp_redirect($login_url);
