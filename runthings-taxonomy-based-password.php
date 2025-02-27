@@ -28,32 +28,28 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-namespace RunThings\TaxonomyBasedPasswords;
+namespace RunThingsTaxonomyBasedPasswords;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
+// Define plugin constants
+define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL', plugin_dir_url(__FILE__));
+define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR', plugin_dir_path(__FILE__));
+
+// Include the configuration file
+require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'config.php';
+
 class Runthings_Taxonomy_Based_Passwords
 {
-    /**
-     * Hub object that is the parent of the protected pages
-     */
-    private $hub_object = ['page'];
-    private $hub_object_id = 123;
-
-    /**
-     * Login page
-     */
-    private $login_page_id = 6515;
-
-    /**
-     * Post types to protect
-     */
-    private $objects = ['grower-news', 'grower-questions', 'farmer-profiles'];
+    private $config;
 
     public function __construct()
     {
+        // Instantiate the config class
+        $this->config = new Config();
+
         // taxonomy
         add_action('init', [$this, 'register_grower_contract_taxonomy']);
         add_action('add_meta_boxes', [$this, 'add_grower_contract_meta_box']);
@@ -97,7 +93,7 @@ class Runthings_Taxonomy_Based_Passwords
             'rewrite'           => ['slug' => 'grower-contract'],
         ];
 
-        $taxonomy_objects = array_merge($this->objects, $this->hub_object);
+        $taxonomy_objects = array_merge($this->config->objects, $this->config->hub_object);
 
         register_taxonomy('grower_contract', $taxonomy_objects, $args);
     }
@@ -165,8 +161,8 @@ class Runthings_Taxonomy_Based_Passwords
 
         $post_type = get_post_type();
 
-        if (in_array($post_type, $this->objects)) {
-            $login_url = get_permalink($this->login_page_id);
+        if (in_array($post_type, $this->config->objects)) {
+            $login_url = get_permalink($this->config->login_page_id);
 
             if ($login_url) {
                 // Add the current URL as a return URL parameter
@@ -211,7 +207,7 @@ class Runthings_Taxonomy_Based_Passwords
                         exit;
                     } else {
                         // Password is incorrect, redirect back to the login page with an error
-                        $login_url = add_query_arg('error', 'incorrect_password', get_permalink($this->login_page_id));
+                        $login_url = add_query_arg('error', 'incorrect_password', get_permalink($this->config->login_page_id));
                         wp_redirect($login_url);
                         exit;
                     }
