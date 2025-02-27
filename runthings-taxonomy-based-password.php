@@ -37,9 +37,13 @@ class Runthings_Taxonomy_Based_Passwords
 
     public function __construct()
     {
+        // taxonomy
         add_action('init', [$this, 'register_grower_contract_taxonomy']);
         add_action('add_meta_boxes', [$this, 'add_grower_contract_meta_box']);
         add_action('save_post', [$this, 'save_grower_contract_meta_box']);
+
+        // protection
+        add_action('template_redirect', [$this, 'simple_protection_redirect']);
     }
 
     /**
@@ -122,6 +126,31 @@ class Runthings_Taxonomy_Based_Passwords
         if (isset($_POST['grower_contract_term'])) {
             $term_id = intval($_POST['grower_contract_term']);
             wp_set_post_terms($post_id, [$term_id], 'grower_contract');
+        }
+    }
+
+    /**
+     * Protect single pages
+     */
+    public function single_protection()
+    {
+        // Only check on singular views
+        if (!is_singular() || is_admin()) {
+            return;
+        }
+
+        $post_type = get_post_type();
+
+        // For now, skip pages
+        if ($post_type === 'page') {
+            return;
+        }
+
+        // If this is one of our protected post types
+        if (in_array($post_type, $this->objects)) {
+            // Simple redirect to homepage for now
+            wp_redirect(home_url());
+            exit;
         }
     }
 }
