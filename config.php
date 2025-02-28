@@ -8,7 +8,7 @@ class Config
      * Hub object that is the parent of the protected pages
      */
     public $hub_object = ['page'];
-    public $hub_object_id = 123;
+    public $hub_object_id = 6522;
 
     /**
      * Login page

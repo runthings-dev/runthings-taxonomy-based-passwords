@@ -33,34 +33,56 @@ class Protection
                 $term_id = $cookie_value['term_id'];
                 $password = $cookie_value['password'];
 
-                $valid_password = $this->get_valid_password($term_id);
+                // Get term id for current single
+                $current_term_id = $this->get_current_term_id();
+                if ($current_term_id !== $term_id) {
+                    // Continue out of if, if mismatched
+                    $this->redirect_to_login();
+                }
+
+                // Get valid password using current single term id
+                $valid_password = $this->get_valid_password($current_term_id);
 
                 if (hash_equals($valid_password, $password)) {
                     return; // User is authenticated
                 }
             }
 
-            $login_url = get_permalink($this->config->login_page_id);
-
-            if ($login_url) {
-                // Add the current URL as a return URL parameter
-                global $wp;
-                $current_url = home_url(add_query_arg([], $wp->request));
-                $login_url = add_query_arg(
-                    [
-                        'return_url' => urlencode($current_url),
-                        'original_post_id' => get_the_ID()
-                    ],
-                    $login_url
-                );
-            } else {
-                // Fallback url
-                $login_url = home_url();
-            }
-
-            wp_redirect($login_url);
-            exit;
+            $this->redirect_to_login();
         }
+    }
+
+    private function get_current_term_id()
+    {
+        $terms = get_the_terms(get_the_ID(), $this->config->taxonomy);
+        if ($terms && !is_wp_error($terms)) {
+            return $terms[0]->term_id;
+        }
+        return null;
+    }
+
+    private function redirect_to_login()
+    {
+        $login_url = get_permalink($this->config->login_page_id);
+
+        if ($login_url) {
+            // Add the current URL as a return URL parameter
+            global $wp;
+            $current_url = home_url(add_query_arg([], $wp->request));
+            $login_url = add_query_arg(
+                [
+                    'return_url' => urlencode($current_url),
+                    'original_post_id' => get_the_ID()
+                ],
+                $login_url
+            );
+        } else {
+            // Fallback url
+            $login_url = home_url();
+        }
+
+        wp_redirect($login_url);
+        exit;
     }
 
     /**
@@ -74,6 +96,8 @@ class Protection
 
         $password = get_term_meta($term_id, 'runthings_taxonomy_password', true);
 
-        return $password;
+        $hashed_password = hash('sha256', $password);
+
+        return $hashed_password;
     }
 }
