@@ -83,21 +83,20 @@ class Protection
     {
         $login_url = get_permalink($this->config->login_page_id);
 
-        if ($login_url) {
-            // Add the current URL as a return URL parameter
-            global $wp;
-            $current_url = home_url(add_query_arg([], $wp->request));
-            $login_url = add_query_arg(
-                [
-                    'return_url' => urlencode($current_url),
-                    'original_post_id' => get_the_ID()
-                ],
-                $login_url
-            );
-        } else {
-            // Fallback url
-            $login_url = home_url();
+        if (!$login_url) {
+            return;
         }
+
+        // Add the current URL as a return URL parameter
+        global $wp;
+        $current_url = home_url(add_query_arg([], $wp->request));
+        $login_url = add_query_arg(
+            [
+                'return_url' => urlencode($current_url),
+                'original_post_id' => get_the_ID()
+            ],
+            $login_url
+        );
 
         wp_redirect($login_url);
         exit;
