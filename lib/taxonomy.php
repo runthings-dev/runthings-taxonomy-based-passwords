@@ -46,7 +46,7 @@ class Taxonomy
 
         $taxonomy_objects = array_merge($this->config->objects, $this->config->hub_object);
 
-        register_taxonomy('grower_contract', $taxonomy_objects, $args);
+        register_taxonomy($this->config->taxonomy, $taxonomy_objects, $args);
     }
 
     /**

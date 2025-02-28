@@ -19,4 +19,9 @@ class Config
      * Post types to protect
      */
     public $objects = ['grower-news', 'grower-questions', 'farmer-profiles'];
+
+    /**
+     * Taxonomy to use for password protection
+     */
+    public $taxonomy = 'grower_contract';
 }
