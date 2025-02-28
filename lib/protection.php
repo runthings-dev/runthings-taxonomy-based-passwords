@@ -4,10 +4,10 @@ namespace RunThingsTaxonomyBasedPassword;
 
 class Protection
 {
-    private $config;
-    private $cookies;
+    private Config $config;
+    private Cookies $cookies;
 
-    public function __construct($config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
         $this->cookies = new Cookies();
@@ -19,7 +19,7 @@ class Protection
     /**
      * Protect single pages
      */
-    public function single_protection()
+    public function single_protection(): void
     {
         if (!is_singular() || is_admin()) {
             return;
@@ -32,18 +32,18 @@ class Protection
         }
     }
 
-    private function is_protected_object($post_type)
+    private function is_protected_object(string $post_type): bool
     {
         return in_array($post_type, $this->config->objects);
     }
 
-    private function is_child_of_hub_object($post_type)
+    private function is_child_of_hub_object(string $post_type): bool
     {
         $post = get_post();
         return $post_type === $this->config->hub_object && $post->post_parent == $this->config->hub_object_id;
     }
 
-    private function check_for_authentication()
+    private function check_for_authentication(): void
     {
         if ($this->cookies->is_logged_in()) {
             $cookie_value = $this->cookies->get_cookie_value();
@@ -65,7 +65,7 @@ class Protection
         $this->redirect_to_login();
     }
 
-    private function get_current_term_id()
+    private function get_current_term_id(): ?int
     {
         $terms = get_the_terms(get_the_ID(), $this->config->taxonomy);
         if ($terms && !is_wp_error($terms)) {
@@ -74,7 +74,7 @@ class Protection
         return null;
     }
 
-    private function redirect_to_login()
+    private function redirect_to_login(): void
     {
         $login_url = get_permalink($this->config->login_page_id);
 
@@ -101,7 +101,7 @@ class Protection
     /**
      * Get the valid password for a post based on the attached taxonomy term
      */
-    private function get_valid_password($term_id)
+    private function get_valid_password(?int $term_id): string
     {
         if (!$term_id) {
             return '';

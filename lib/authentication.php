@@ -4,10 +4,10 @@ namespace RunThingsTaxonomyBasedPassword;
 
 class Authentication
 {
-    private $config;
-    private $cookies;
+    private Config $config;
+    private Cookies $cookies;
 
-    public function __construct($config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
         $this->cookies = new Cookies();
@@ -26,7 +26,7 @@ class Authentication
     /**
      * Handle form submission
      */
-    public function handle_form_submission()
+    public function handle_form_submission(): void
     {
         if (!isset($_POST['runthings_taxonomy_based_password_form']) || $_POST['runthings_taxonomy_based_password_form'] !== 'login_form') {
             return;
@@ -67,7 +67,7 @@ class Authentication
     /**
      * Handle logout
      */
-    public function handle_logout()
+    public function handle_logout(): void
     {
         if (isset($_GET['runthings_taxonomy_logout'])) {
             $this->cookies->clear_cookie();
@@ -79,7 +79,7 @@ class Authentication
     /**
      * Renders the login form using custom markup similar to the built-in WordPress password form
      */
-    public function render_login_form($atts)
+    public function render_login_form(array $atts): string
     {
         $field_id = 'pwbox-' . rand();
         $invalid_password = __('The password you entered is incorrect.');
@@ -120,7 +120,7 @@ class Authentication
     /**
      * Renders the logout link if the user is logged in
      */
-    public function render_logout_link($atts)
+    public function render_logout_link(array $atts): string
     {
         if ($this->cookies->is_logged_in()) {
             $logout_url = add_query_arg('runthings_taxonomy_logout', 'true', home_url());
@@ -133,12 +133,12 @@ class Authentication
     /**
      * Get the term ID for a post based on the attached taxonomy term
      */
-    private function get_term_id($post_id)
+    private function get_term_id(int $post_id): int
     {
         $terms = wp_get_post_terms($post_id, $this->config->taxonomy, ['fields' => 'ids']);
 
         if (is_wp_error($terms) || empty($terms)) {
-            return false;
+            return 0;
         }
 
         return $terms[0];
@@ -147,7 +147,7 @@ class Authentication
     /**
      * Get the valid password for a post based on the attached taxonomy term
      */
-    private function get_valid_password($term_id)
+    private function get_valid_password(int $term_id): string
     {
         if (!$term_id) {
             return '';

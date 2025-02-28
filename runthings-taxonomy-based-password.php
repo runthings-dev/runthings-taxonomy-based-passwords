@@ -7,6 +7,7 @@
  * Version: 0.1.0
  * Author: runthingsdev
  * Author URI: https://runthings.dev/
+ * Requires PHP: 7.4
  * License: GPLv3 or later
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: runthings-dodd-sculptor-profiles-sitemap
@@ -49,7 +50,7 @@ require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/admin-options.php';
 
 class Runthings_Taxonomy_Based_Passwords
 {
-    private $config;
+    private Config $config;
 
     public function __construct()
     {
@@ -63,14 +64,14 @@ class Runthings_Taxonomy_Based_Passwords
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
     }
 
-    public function add_settings_link($links)
+    public function add_settings_link(array $links): array
     {
         $settings_link = '<a href="options-general.php?page=runthings-taxonomy-based-passwords">' . __('Settings') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
 
-    public static function uninstall()
+    public static function uninstall(): void
     {
         delete_option('runthings_taxonomy_based_passwords_settings');
     }

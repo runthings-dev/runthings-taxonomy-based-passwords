@@ -4,7 +4,7 @@ namespace RunThingsTaxonomyBasedPassword;
 
 class Cookies
 {
-    private $cookie_name;
+    private string $cookie_name;
 
     public function __construct()
     {
@@ -14,7 +14,7 @@ class Cookies
     /**
      * Set the cookie
      */
-    public function set_cookie($password, $term_id)
+    public function set_cookie(string $password, int $term_id): void
     {
         $hashed_password = hash('sha256', $password);
         $cookie_value = json_encode(['term_id' => $term_id, 'password' => $hashed_password]);
@@ -25,7 +25,7 @@ class Cookies
     /**
      * Clear the cookie
      */
-    public function clear_cookie()
+    public function clear_cookie(): void
     {
         setcookie($this->cookie_name, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
     }
@@ -33,7 +33,7 @@ class Cookies
     /**
      * Check if the user is logged in
      */
-    public function is_logged_in()
+    public function is_logged_in(): bool
     {
         return isset($_COOKIE[$this->cookie_name]);
     }
@@ -41,7 +41,7 @@ class Cookies
     /**
      * Get the cookie value
      */
-    public function get_cookie_value()
+    public function get_cookie_value(): ?array
     {
         if ($this->is_logged_in()) {
             return json_decode(stripslashes($_COOKIE[$this->cookie_name]), true);

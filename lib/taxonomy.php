@@ -4,9 +4,9 @@ namespace RunThingsTaxonomyBasedPassword;
 
 class Taxonomy
 {
-    private $config;
+    private Config $config;
 
-    public function __construct($config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
 
@@ -25,7 +25,7 @@ class Taxonomy
     /**
      * Registers the grower_contract taxonomy
      */
-    public function register_grower_contract_taxonomy()
+    public function register_grower_contract_taxonomy(): void
     {
         $labels = [
             'name'              => _x('Grower Contracts', 'taxonomy general name', 'runthings'),
@@ -58,7 +58,7 @@ class Taxonomy
     /**
      * Adds a custom meta box for grower_contract taxonomy
      */
-    public function add_grower_contract_meta_boxes()
+    public function add_grower_contract_meta_boxes(): void
     {
         foreach ($this->config->objects as $post_type) {
             $this->add_grower_contract_meta_box($post_type);
@@ -78,7 +78,7 @@ class Taxonomy
     /**
      * Adds the custom meta box
      */
-    public function add_grower_contract_meta_box($post_type)
+    public function add_grower_contract_meta_box(string $post_type): void
     {
         add_meta_box(
             'grower_contract_meta_box',
@@ -93,7 +93,7 @@ class Taxonomy
     /**
      * Renders the grower_contract meta box
      */
-    public function render_grower_contract_meta_box($post)
+    public function render_grower_contract_meta_box(\WP_Post $post): void
     {
         $terms = get_terms([
             'taxonomy' => $this->config->taxonomy,
@@ -115,7 +115,7 @@ class Taxonomy
     /**
      * Saves the grower_contract meta box selection
      */
-    public function save_grower_contract_meta_box($post_id)
+    public function save_grower_contract_meta_box(int $post_id): void
     {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
@@ -132,7 +132,7 @@ class Taxonomy
         }
     }
 
-    private function is_hub_child($post)
+    private function is_hub_child(\WP_Post $post): bool
     {
         return $post->post_type === $this->config->hub_object && $post->post_parent == $this->config->hub_object_id;
     }
@@ -140,7 +140,7 @@ class Taxonomy
     /**
      * Adds a password field to the add term form
      */
-    public function add_password_field()
+    public function add_password_field(): void
     {
 ?>
         <div class="form-field term-password-wrap">
@@ -154,7 +154,7 @@ class Taxonomy
     /**
      * Adds a password field to the edit term form
      */
-    public function edit_password_field($term)
+    public function edit_password_field(\WP_Term $term): void
     {
         $password = get_term_meta($term->term_id, 'runthings_taxonomy_password', true);
     ?>
@@ -171,7 +171,7 @@ class Taxonomy
     /**
      * Saves the password field for the term
      */
-    public function save_password_field($term_id)
+    public function save_password_field(int $term_id): void
     {
         if (isset($_POST['term_password'])) {
             update_term_meta($term_id, 'runthings_taxonomy_password', sanitize_text_field($_POST['term_password']));

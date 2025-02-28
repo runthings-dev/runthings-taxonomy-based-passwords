@@ -4,16 +4,16 @@ namespace RunThingsTaxonomyBasedPassword;
 
 class AdminOptions
 {
-    private $config;
+    private Config $config;
 
-    public function __construct($config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
         add_action('admin_menu', [$this, 'add_settings_page']);
         add_action('admin_init', [$this, 'register_settings']);
     }
 
-    public function add_settings_page()
+    public function add_settings_page(): void
     {
         add_submenu_page(
             'options-general.php', // Parent slug
@@ -25,7 +25,7 @@ class AdminOptions
         );
     }
 
-    public function register_settings()
+    public function register_settings(): void
     {
         register_setting('runthings_taxonomy_based_passwords', 'runthings_taxonomy_based_passwords_settings');
 
@@ -69,7 +69,7 @@ class AdminOptions
         );
     }
 
-    public function render_settings_page()
+    public function render_settings_page(): void
     {
 ?>
         <div class="wrap">
@@ -85,7 +85,7 @@ class AdminOptions
     <?php
     }
 
-    public function render_hub_object_id_field()
+    public function render_hub_object_id_field(): void
     {
         $options = get_option('runthings_taxonomy_based_passwords_settings');
     ?>
@@ -100,7 +100,7 @@ class AdminOptions
     <?php
     }
 
-    public function render_login_page_id_field()
+    public function render_login_page_id_field(): void
     {
         $options = get_option('runthings_taxonomy_based_passwords_settings');
     ?>
@@ -115,7 +115,7 @@ class AdminOptions
     <?php
     }
 
-    public function render_objects_field()
+    public function render_objects_field(): void
     {
         $options = get_option('runthings_taxonomy_based_passwords_settings');
         $selected_objects = isset($options['objects']) ? $options['objects'] : [];
@@ -144,7 +144,7 @@ class AdminOptions
     <?php
     }
 
-    public function render_exempt_roles_field()
+    public function render_exempt_roles_field(): void
     {
         $options = get_option('runthings_taxonomy_based_passwords_settings');
         $selected_roles = isset($options['exempt_roles']) ? $options['exempt_roles'] : [];
