@@ -14,6 +14,12 @@ class Taxonomy
         add_action('init', [$this, 'register_grower_contract_taxonomy']);
         add_action('add_meta_boxes', [$this, 'add_grower_contract_meta_box']);
         add_action('save_post', [$this, 'save_grower_contract_meta_box']);
+
+        // Add password field to taxonomy terms
+        add_action('grower_contract_add_form_fields', [$this, 'add_password_field']);
+        add_action('grower_contract_edit_form_fields', [$this, 'edit_password_field']);
+        add_action('created_grower_contract', [$this, 'save_password_field']);
+        add_action('edited_grower_contract', [$this, 'save_password_field']);
     }
 
     /**
@@ -98,6 +104,47 @@ class Taxonomy
         if (isset($_POST['grower_contract_term'])) {
             $term_id = intval($_POST['grower_contract_term']);
             wp_set_post_terms($post_id, [$term_id], 'grower_contract');
+        }
+    }
+
+    /**
+     * Adds a password field to the add term form
+     */
+    public function add_password_field()
+    {
+?>
+        <div class="form-field term-password-wrap">
+            <label for="term-password"><?php _e('Password', 'runthings'); ?></label>
+            <input type="text" name="term_password" id="term-password" value="" />
+            <p class="description"><?php _e('Enter a password for this term.', 'runthings'); ?></p>
+        </div>
+    <?php
+    }
+
+    /**
+     * Adds a password field to the edit term form
+     */
+    public function edit_password_field($term)
+    {
+        $password = get_term_meta($term->term_id, 'password', true);
+    ?>
+        <tr class="form-field term-password-wrap">
+            <th scope="row"><label for="term-password"><?php _e('Password', 'runthings'); ?></label></th>
+            <td>
+                <input type="text" name="term_password" id="term-password" value="<?php echo esc_attr($password); ?>" />
+                <p class="description"><?php _e('Enter a password for this term.', 'runthings'); ?></p>
+            </td>
+        </tr>
+<?php
+    }
+
+    /**
+     * Saves the password field for the term
+     */
+    public function save_password_field($term_id)
+    {
+        if (isset($_POST['term_password'])) {
+            update_term_meta($term_id, 'password', sanitize_text_field($_POST['term_password']));
         }
     }
 }
