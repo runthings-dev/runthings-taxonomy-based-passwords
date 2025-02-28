@@ -5,12 +5,10 @@ namespace RunThingsTaxonomyBasedPassword;
 class Authentication
 {
     private $config;
-    private $cookie_name;
 
     public function __construct($config)
     {
         $this->config = $config;
-        $this->cookie_name = 'runthings_taxonomy_based_password' . COOKIEHASH;
 
         // Add shortcodes
         add_shortcode('runthings_taxonomy_login_form', [$this, 'render_login_form']);
@@ -138,7 +136,7 @@ class Authentication
         $hashed_password = hash('sha256', $password);
         $cookie_value = json_encode(['term_id' => $term_id, 'password' => $hashed_password]);
         $expiration_time = 12 * 30 * 24 * 60 * 60; // 12 months
-        setcookie($this->cookie_name, $cookie_value, time() + $expiration_time, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+        setcookie($this->config->cookie_name, $cookie_value, time() + $expiration_time, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
     }
 
     /**
@@ -146,7 +144,7 @@ class Authentication
      */
     private function clear_cookie()
     {
-        setcookie($this->cookie_name, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+        setcookie($this->config->cookie_name, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
     }
 
     /**
@@ -154,7 +152,7 @@ class Authentication
      */
     private function is_logged_in()
     {
-        return isset($_COOKIE[$this->cookie_name]);
+        return isset($_COOKIE[$this->config->cookie_name]);
     }
 
     /**
