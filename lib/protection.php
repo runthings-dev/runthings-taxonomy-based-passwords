@@ -72,7 +72,7 @@ class Protection
             return '';
         }
 
-        $password = get_term_meta($term_id, 'password', true);
+        $password = get_term_meta($term_id, 'runthings_taxonomy_password', true);
 
         return $password;
     }

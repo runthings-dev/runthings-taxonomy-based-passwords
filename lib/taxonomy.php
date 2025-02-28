@@ -126,7 +126,7 @@ class Taxonomy
      */
     public function edit_password_field($term)
     {
-        $password = get_term_meta($term->term_id, 'password', true);
+        $password = get_term_meta($term->term_id, 'runthings_taxonomy_password', true);
     ?>
         <tr class="form-field term-password-wrap">
             <th scope="row"><label for="term-password"><?php _e('Password', 'runthings'); ?></label></th>
@@ -144,7 +144,7 @@ class Taxonomy
     public function save_password_field($term_id)
     {
         if (isset($_POST['term_password'])) {
-            update_term_meta($term_id, 'password', sanitize_text_field($_POST['term_password']));
+            update_term_meta($term_id, 'runthings_taxonomy_password', sanitize_text_field($_POST['term_password']));
         }
     }
 }
