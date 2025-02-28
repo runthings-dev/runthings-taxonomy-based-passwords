@@ -62,6 +62,7 @@ class Runthings_Taxonomy_Based_Passwords
         new AdminOptions($this->config);
 
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
+        add_action('admin_notices', [$this, 'check_login_page_set']);
     }
 
     public function add_settings_link(array $links): array
@@ -69,6 +70,15 @@ class Runthings_Taxonomy_Based_Passwords
         $settings_link = '<a href="options-general.php?page=runthings-taxonomy-based-passwords">' . __('Settings') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
+    }
+
+    public function check_login_page_set(): void
+    {
+        if ($this->config->login_page_id === 0) {
+            echo '<div class="notice notice-warning is-dismissible">';
+            echo '<p><strong>' . __('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords') . ':</strong> ' . __('The login page is not set. Content will not be protected until the login page is set up.', 'runthings-taxonomy-based-passwords') . '</p>';
+            echo '</div>';
+        }
     }
 
     public static function activate(): void
