@@ -90,6 +90,7 @@ class AdminOptions
         $options = get_option('runthings_taxonomy_based_passwords_settings');
     ?>
         <select id="hub_object_id" name="runthings_taxonomy_based_passwords_settings[hub_object_id]" class="select2">
+            <option value="0" <?php selected($options['hub_object_id'], 0); ?>><?php _e('Please select', 'runthings-dodd-sculptor-profiles-sitemap'); ?></option>
             <?php
             $pages = get_posts(['post_type' => 'page', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC']);
             foreach ($pages as $page) {
@@ -105,6 +106,7 @@ class AdminOptions
         $options = get_option('runthings_taxonomy_based_passwords_settings');
     ?>
         <select id="login_page_id" name="runthings_taxonomy_based_passwords_settings[login_page_id]" class="select2">
+            <option value="0" <?php selected($options['login_page_id'], 0); ?>><?php _e('Please select', 'runthings-dodd-sculptor-profiles-sitemap'); ?></option>
             <?php
             $pages = get_posts(['post_type' => 'page', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC']);
             foreach ($pages as $page) {
