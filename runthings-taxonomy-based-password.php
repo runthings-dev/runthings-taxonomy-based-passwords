@@ -59,6 +59,15 @@ class Runthings_Taxonomy_Based_Passwords
         new Protection($this->config);
         new Authentication($this->config);
         new AdminOptions($this->config);
+
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
+    }
+
+    public function add_settings_link($links)
+    {
+        $settings_link = '<a href="options-general.php?page=runthings-taxonomy-based-passwords">' . __('Settings') . '</a>';
+        array_unshift($links, $settings_link);
+        return $links;
     }
 }
 
