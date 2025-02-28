@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: RunThings Taxonomy-Based Passwords
+ * Plugin Name: Taxonomy-Based Passwords
  * Plugin URI: https://runthings.dev
  * Description: A plugin to implement password protection based on taxonomy terms.
  * Version: 0.1.0
