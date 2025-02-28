@@ -60,14 +60,18 @@ class Taxonomy
      */
     public function add_grower_contract_meta_box()
     {
-        add_meta_box(
-            'grower_contract_meta_box',
-            __('Grower Contract', 'runthings'),
-            [$this, 'render_grower_contract_meta_box'],
-            ['farmer-profiles'],
-            'side',
-            'default'
-        );
+        $taxonomy_objects = array_merge($this->config->objects, $this->config->hub_object);
+
+        foreach ($taxonomy_objects as $post_type) {
+            add_meta_box(
+                'grower_contract_meta_box',
+                __('Grower Contract', 'runthings'),
+                [$this, 'render_grower_contract_meta_box'],
+                $post_type,
+                'side',
+                'default'
+            );
+        }
     }
 
     /**
