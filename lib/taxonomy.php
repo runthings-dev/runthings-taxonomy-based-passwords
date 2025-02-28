@@ -12,7 +12,7 @@ class Taxonomy
 
         // Register taxonomy
         add_action('init', [$this, 'register_grower_contract_taxonomy']);
-        add_action('add_meta_boxes', [$this, 'add_grower_contract_meta_box']);
+        add_action('add_meta_boxes', [$this, 'add_grower_contract_meta_boxes']);
         add_action('save_post', [$this, 'save_grower_contract_meta_box']);
 
         // Add custom password field to the taxonomy terms
@@ -58,20 +58,36 @@ class Taxonomy
     /**
      * Adds a custom meta box for grower_contract taxonomy
      */
-    public function add_grower_contract_meta_box()
+    public function add_grower_contract_meta_boxes()
     {
-        $taxonomy_objects = array_merge($this->config->objects, [$this->config->hub_object]);
-
-        foreach ($taxonomy_objects as $post_type) {
-            add_meta_box(
-                'grower_contract_meta_box',
-                __('Grower Contract', 'runthings'),
-                [$this, 'render_grower_contract_meta_box'],
-                $post_type,
-                'side',
-                'default'
-            );
+        foreach ($this->config->objects as $post_type) {
+            $this->add_grower_contract_meta_box($post_type);
         }
+
+        if (get_post_type() === $this->config->hub_object) {
+            global $post;
+
+            if (!$this->is_hub_child($post)) {
+                return;
+            }
+
+            $this->add_grower_contract_meta_box($this->config->hub_object);
+        }
+    }
+
+    /**
+     * Adds the custom meta box
+     */
+    public function add_grower_contract_meta_box($post_type)
+    {
+        add_meta_box(
+            'grower_contract_meta_box',
+            __('Grower Contract', 'runthings'),
+            [$this, 'render_grower_contract_meta_box'],
+            $post_type,
+            'side',
+            'default'
+        );
     }
 
     /**
@@ -105,10 +121,20 @@ class Taxonomy
             return;
         }
 
+        $post = get_post($post_id);
+        if (!$this->is_hub_child($post)) {
+            return;
+        }
+
         if (isset($_POST['grower_contract_term'])) {
             $term_id = intval($_POST['grower_contract_term']);
             wp_set_post_terms($post_id, [$term_id], 'grower_contract');
         }
+    }
+
+    private function is_hub_child($post)
+    {
+        return $post->post_type === $this->config->hub_object && $post->post_parent == $this->config->hub_object_id;
     }
 
     /**
