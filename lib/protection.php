@@ -27,26 +27,42 @@ class Protection
 
         $post_type = get_post_type();
 
-        if (in_array($post_type, $this->config->objects)) {
-            if ($this->cookies->is_logged_in()) {
-                $cookie_value = $this->cookies->get_cookie_value();
-                $term_id = $cookie_value['term_id'];
-                $password = $cookie_value['password'];
+        if ($this->is_protected_object($post_type) || $this->is_child_of_hub_object($post_type)) {
+            $this->check_for_authentication();
+        }
+    }
 
-                $current_term_id = $this->get_current_term_id();
-                if ($current_term_id !== $term_id) {
-                    $this->redirect_to_login();
-                }
+    private function is_protected_object($post_type)
+    {
+        return in_array($post_type, $this->config->objects);
+    }
 
-                $valid_password = $this->get_valid_password($current_term_id);
+    private function is_child_of_hub_object($post_type)
+    {
+        $post = get_post();
+        return $post_type === $this->config->hub_object && $post->post_parent == $this->config->hub_object_id;
+    }
 
-                if (hash_equals($valid_password, $password)) {
-                    return; // User is authenticated
-                }
+    private function check_for_authentication()
+    {
+        if ($this->cookies->is_logged_in()) {
+            $cookie_value = $this->cookies->get_cookie_value();
+            $term_id = $cookie_value['term_id'];
+            $password = $cookie_value['password'];
+
+            $current_term_id = $this->get_current_term_id();
+            if ($current_term_id !== $term_id) {
+                $this->redirect_to_login();
             }
 
-            $this->redirect_to_login();
+            $valid_password = $this->get_valid_password($current_term_id);
+
+            if (hash_equals($valid_password, $password)) {
+                return; // User is authenticated
+            }
         }
+
+        $this->redirect_to_login();
     }
 
     private function get_current_term_id()
