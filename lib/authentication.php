@@ -59,6 +59,8 @@ class Authentication
             'error' => 'incorrect_password',
             'return_url' => urlencode($return_url),
             'original_post_id' => $original_post_id
+            // Caution: login_page_id may be 0. Currently the form only submits from the login page
+            // so this should not be an issue, but if its used elsewhere, it may need to be updated
         ], get_permalink($this->config->login_page_id));
         wp_safe_redirect($login_url);
         exit;

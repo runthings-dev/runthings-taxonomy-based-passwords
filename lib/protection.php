@@ -40,7 +40,12 @@ class Protection
     private function is_child_of_hub_object(string $post_type): bool
     {
         $post = get_post();
-        return $post_type === $this->config->hub_object && $post->post_parent == $this->config->hub_object_id;
+
+        if (!$this->config->hub_object_id) {
+            return false;
+        }
+
+        return $post && $post_type === $this->config->hub_object && $post->post_parent == $this->config->hub_object_id;
     }
 
     private function check_for_authentication(): void

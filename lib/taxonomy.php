@@ -122,7 +122,7 @@ class Taxonomy
         }
 
         $post = get_post($post_id);
-        if (!$this->is_hub_child($post)) {
+        if (!$this->is_child_of_hub_object($post)) {
             return;
         }
 
@@ -132,8 +132,12 @@ class Taxonomy
         }
     }
 
-    private function is_hub_child(\WP_Post $post): bool
+    private function is_child_of_hub_object(\WP_Post $post): bool
     {
+        if (!$this->config->hub_object_id) {
+            return false;
+        }
+
         return $post->post_type === $this->config->hub_object && $post->post_parent == $this->config->hub_object_id;
     }
 
