@@ -81,6 +81,10 @@ class Protection
 
     private function redirect_to_login(): void
     {
+        if ($this->config->login_page_id === 0) {
+            return; // Do not redirect if the login page is not set
+        }
+
         $login_url = get_permalink($this->config->login_page_id);
 
         if (!$login_url) {
