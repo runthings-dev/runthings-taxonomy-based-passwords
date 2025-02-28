@@ -33,14 +33,11 @@ class Protection
                 $term_id = $cookie_value['term_id'];
                 $password = $cookie_value['password'];
 
-                // Get term id for current single
                 $current_term_id = $this->get_current_term_id();
                 if ($current_term_id !== $term_id) {
-                    // Continue out of if, if mismatched
                     $this->redirect_to_login();
                 }
 
-                // Get valid password using current single term id
                 $valid_password = $this->get_valid_password($current_term_id);
 
                 if (hash_equals($valid_password, $password)) {
