@@ -10,7 +10,7 @@
  * Requires PHP: 7.4
  * License: GPLv3 or later
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain: runthings-dodd-sculptor-profiles-sitemap
+ * Text Domain: runthings-taxonomy-based-passwords
  */
 /*
 Copyright 2025 Matthew Harris
