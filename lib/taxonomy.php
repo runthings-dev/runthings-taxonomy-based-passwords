@@ -15,7 +15,7 @@ class Taxonomy
         add_action('add_meta_boxes', [$this, 'add_grower_contract_meta_box']);
         add_action('save_post', [$this, 'save_grower_contract_meta_box']);
 
-        // Add password field to taxonomy terms
+        // Add custom password field to the taxonomy terms
         add_action('grower_contract_add_form_fields', [$this, 'add_password_field']);
         add_action('grower_contract_edit_form_fields', [$this, 'edit_password_field']);
         add_action('created_grower_contract', [$this, 'save_password_field']);
@@ -76,7 +76,7 @@ class Taxonomy
     public function render_grower_contract_meta_box($post)
     {
         $terms = get_terms([
-            'taxonomy' => 'grower_contract',
+            'taxonomy' => $this->config->taxonomy,
             'hide_empty' => false,
             'orderby' => 'name',
             'order' => 'ASC'
