@@ -101,7 +101,7 @@ class Taxonomy
             'orderby' => 'name',
             'order' => 'ASC'
         ]);
-        $selected_term = wp_get_post_terms($post->ID, 'grower_contract', ['fields' => 'ids']);
+        $selected_term = wp_get_post_terms($post->ID, $this->config->taxonomy, ['fields' => 'ids']);
         $selected_term = !empty($selected_term) ? $selected_term[0] : '';
 
         echo '<select name="grower_contract_term" id="grower_contract_term">';
@@ -128,7 +128,7 @@ class Taxonomy
 
         if (isset($_POST['grower_contract_term'])) {
             $term_id = intval($_POST['grower_contract_term']);
-            wp_set_post_terms($post_id, [$term_id], 'grower_contract');
+            wp_set_post_terms($post_id, [$term_id], $this->config->taxonomy);
         }
     }
 
