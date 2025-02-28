@@ -50,7 +50,7 @@ class Taxonomy
             'rewrite'           => ['slug' => 'grower-contract'],
         ];
 
-        $taxonomy_objects = array_merge($this->config->objects, $this->config->hub_object);
+        $taxonomy_objects = array_merge($this->config->objects, [$this->config->hub_object]);
 
         register_taxonomy($this->config->taxonomy, $taxonomy_objects, $args);
     }
@@ -60,7 +60,7 @@ class Taxonomy
      */
     public function add_grower_contract_meta_box()
     {
-        $taxonomy_objects = array_merge($this->config->objects, $this->config->hub_object);
+        $taxonomy_objects = array_merge($this->config->objects, [$this->config->hub_object]);
 
         foreach ($taxonomy_objects as $post_type) {
             add_meta_box(
