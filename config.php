@@ -24,4 +24,9 @@ class Config
      * Taxonomy to use for password protection
      */
     public $taxonomy = 'grower_contract';
+
+    /**
+     * Admin menu capability
+     */
+    public $admin_options_capability = 'edit_pages';
 }
