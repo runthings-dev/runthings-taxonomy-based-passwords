@@ -69,7 +69,15 @@ class Runthings_Taxonomy_Based_Passwords
         array_unshift($links, $settings_link);
         return $links;
     }
+
+    public static function uninstall()
+    {
+        delete_option('runthings_taxonomy_based_passwords_settings');
+    }
 }
 
 // Initialize the plugin
 new Runthings_Taxonomy_Based_Passwords();
+
+// Register uninstall hook
+register_uninstall_hook(__FILE__, ['Runthings_Taxonomy_Based_Passwords', 'uninstall']);
