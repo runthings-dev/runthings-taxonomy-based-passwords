@@ -71,6 +71,20 @@ class Runthings_Taxonomy_Based_Passwords
         return $links;
     }
 
+    public static function activate(): void
+    {
+        $default_settings = [
+            'hub_object_id' => 0,
+            'login_page_id' => 0,
+            'objects' => [],
+            'exempt_roles' => ['administrator', 'editor'],
+        ];
+
+        if (!get_option('runthings_taxonomy_based_passwords_settings')) {
+            update_option('runthings_taxonomy_based_passwords_settings', $default_settings);
+        }
+    }
+
     public static function uninstall(): void
     {
         delete_option('runthings_taxonomy_based_passwords_settings');
@@ -79,6 +93,9 @@ class Runthings_Taxonomy_Based_Passwords
 
 // Initialize the plugin
 new Runthings_Taxonomy_Based_Passwords();
+
+// Register activation hook
+register_activation_hook(__FILE__, ['Runthings_Taxonomy_Based_Passwords', 'activate']);
 
 // Register uninstall hook
 register_uninstall_hook(__FILE__, ['Runthings_Taxonomy_Based_Passwords', 'uninstall']);

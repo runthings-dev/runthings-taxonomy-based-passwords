@@ -39,9 +39,9 @@ class Config
     {
         $settings = get_option('runthings_taxonomy_based_passwords_settings', []);
 
-        $this->hub_object_id = (int) ($settings['hub_object_id'] ?? 6522);
-        $this->login_page_id = (int) ($settings['login_page_id'] ?? 6515);
-        $this->objects = $settings['objects'] ?? ['grower-news', 'grower-questions', 'farmer-profiles'];
-        $this->exempt_roles = $settings['exempt_roles'] ?? ['administrator'];
+        $this->hub_object_id = (int) ($settings['hub_object_id'] ?? 0);
+        $this->login_page_id = (int) ($settings['login_page_id'] ?? 0);
+        $this->objects = $settings['objects'] ?? [];
+        $this->exempt_roles = $settings['exempt_roles'] ?? [];
     }
 }
