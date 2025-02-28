@@ -5,16 +5,22 @@ namespace RunThingsTaxonomyBasedPassword;
 class Authentication
 {
     private $config;
+    private $cookie_name;
 
     public function __construct($config)
     {
         $this->config = $config;
+        $this->cookie_name = 'runthings_taxonomy_based_password' . COOKIEHASH;
 
-        // Add shortcode
+        // Add shortcodes
         add_shortcode('runthings_taxonomy_login_form', [$this, 'render_login_form']);
+        add_shortcode('runthings_taxonomy_logout', [$this, 'render_logout_link']);
 
         // Handle form submission
         add_action('init', [$this, 'handle_form_submission']);
+
+        // Handle logout
+        add_action('init', [$this, 'handle_logout']);
     }
 
     /**
@@ -59,6 +65,18 @@ class Authentication
     }
 
     /**
+     * Handle logout
+     */
+    public function handle_logout()
+    {
+        if (isset($_GET['runthings_taxonomy_logout'])) {
+            $this->clear_cookie();
+            wp_safe_redirect(home_url());
+            exit;
+        }
+    }
+
+    /**
      * Renders the login form using custom markup similar to the built-in WordPress password form
      */
     public function render_login_form($atts)
@@ -100,15 +118,43 @@ class Authentication
     }
 
     /**
+     * Renders the logout link if the user is logged in
+     */
+    public function render_logout_link($atts)
+    {
+        if ($this->is_logged_in()) {
+            $logout_url = add_query_arg('runthings_taxonomy_logout', 'true', home_url());
+            return '<a href="' . esc_url($logout_url) . '">' . __('Log out') . '</a>';
+        }
+
+        return '';
+    }
+
+    /**
      * Set the cookie object
      */
     private function set_cookie($password, $term_id)
     {
         $hashed_password = hash('sha256', $password);
-        $cookie_name = 'runthings_taxonomy_based_password' . COOKIEHASH;
         $cookie_value = json_encode(['term_id' => $term_id, 'password' => $hashed_password]);
         $expiration_time = 12 * 30 * 24 * 60 * 60; // 12 months
-        setcookie($cookie_name, $cookie_value, time() + $expiration_time, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+        setcookie($this->cookie_name, $cookie_value, time() + $expiration_time, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+    }
+
+    /**
+     * Clear the cookie
+     */
+    private function clear_cookie()
+    {
+        setcookie($this->cookie_name, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+    }
+
+    /**
+     * Check if the user is logged in
+     */
+    private function is_logged_in()
+    {
+        return isset($_COOKIE[$this->cookie_name]);
     }
 
     /**
