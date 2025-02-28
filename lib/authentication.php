@@ -10,73 +10,91 @@ class Authentication
     {
         $this->config = $config;
 
-        // Add custom authentication
-        add_filter('authenticate', [$this, 'custom_authenticate'], 30, 3);
-
         // Add shortcode
         add_shortcode('runthings_taxonomy_login_form', [$this, 'render_login_form']);
+
+        // Handle form submission
+        add_action('init', [$this, 'handle_form_submission']);
     }
 
     /**
-     * Custom authentication function
+     * Handle form submission
      */
-    public function custom_authenticate($user, $username, $password)
+    public function handle_form_submission()
     {
-        if (isset($_POST['runthings_taxonomy_based_password_form']) && $_POST['runthings_taxonomy_based_password_form'] === 'login_form') {
-            if (isset($_POST['post_password']) && isset($_POST['return_url'])) {
-                $password = $_POST['post_password'];
-                $return_url = esc_url_raw($_POST['return_url']);
-                $original_post_id = url_to_postid($return_url);
-
-                if ($original_post_id) {
-                    $original_post = get_post($original_post_id);
-                    $terms = wp_get_post_terms($original_post_id, 'grower_contract', ['fields' => 'names']);
-                    $valid_password = !empty($terms) ? $terms[0] : '';
-
-                    if ($original_post && $valid_password === $password) {
-                        // Password is correct
-                        $this->set_cookie($password, 123);
-                        wp_redirect($return_url);
-                        exit;
-                    } else {
-                        return new \WP_Error('incorrect_password', __('The password you entered is incorrect.'));
-                    }
-                }
-            }
+        if (!isset($_POST['runthings_taxonomy_based_password_form']) || $_POST['runthings_taxonomy_based_password_form'] !== 'login_form') {
+            return;
         }
 
-        return $user;
+        if (!isset($_POST['post_password']) || !isset($_POST['return_url']) || !isset($_POST['original_post_id'])) {
+            return;
+        }
+
+        $password = sanitize_text_field($_POST['post_password']);
+        $return_url = esc_url_raw($_POST['return_url']);
+        $original_post_id = intval($_POST['original_post_id']);
+
+        if (!$original_post_id || trim($return_url) === '') {
+            return;
+        }
+
+        $term_id = $this->get_term_id($original_post_id);
+        $valid_password = $this->get_valid_password($term_id);
+
+        if (hash_equals($valid_password, $password)) {
+            // Password is correct
+            $this->set_cookie($password, $term_id);
+            wp_safe_redirect($return_url);
+            exit;
+        }
+
+        // Password is incorrect, add error query parameter
+        $login_url = add_query_arg([
+            'error' => 'incorrect_password',
+            'return_url' => urlencode($return_url),
+            'original_post_id' => $original_post_id
+        ], get_permalink($this->config->login_page_id));
+        wp_safe_redirect($login_url);
+        exit;
     }
 
     /**
-     * Renders the login form using the built-in WordPress password form
+     * Renders the login form using custom markup similar to the built-in WordPress password form
      */
     public function render_login_form($atts)
     {
-        global $post;
+        $field_id = 'pwbox-' . rand();
+        $invalid_password = __('The password you entered is incorrect.');
+        $invalid_password_html = '';
+        $aria = '';
+        $class = '';
 
-        // Use a temporary post object to generate the form
-        $temp_post = new \stdClass();
-        $temp_post->ID = 0;
-        $temp_post->post_password = '';
-
-        // Generate the password form
-        $form = get_the_password_form($temp_post);
-
-        // Customize the form if needed
-        $form = str_replace(
-            'This content is password protected.',
-            'This content is restricted to contracted growers. Please enter your password to view it.',
-            $form
-        );
-
-        // Add a hidden field for the return URL and custom form identifier
-        if (isset($_GET['return'])) {
-            $return_url = esc_url($_GET['return']);
-            $hidden_fields = '<input type="hidden" name="return_url" value="' . $return_url . '">';
-            $hidden_fields .= '<input type="hidden" name="runthings_taxonomy_based_password_form" value="login_form">';
-            $form = str_replace('</form>', $hidden_fields . '</form>', $form);
+        // Set Up error message if present
+        if (isset($_GET['error']) && $_GET['error'] === 'incorrect_password') {
+            $invalid_password_html = '<div class="post-password-form-invalid-password" role="alert"><p id="error-' . $field_id . '">' . $invalid_password . '</p></div>';
+            $class = ' password-form-error';
+            $aria = ' aria-describedby="error-' . $field_id . '"';
         }
+
+        $form = '<form method="post" class="post-password-form' . $class . '"> ' . $invalid_password_html;
+        $form .= '<p>' . __('This content is restricted to contracted growers. Please enter your password to view it.') . '</p>';
+        $form .= '<p><label for="' . $field_id . '">' . __('Password:') . ' <input name="post_password" id="' . $field_id . '" type="password" spellcheck="false" required  size="20" ' . $aria . ' /></label>';
+        $form .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter') . '" /></p>';
+
+        // Add hidden fields for return URL and form type
+        if (isset($_GET['return_url'])) {
+            $return_url = esc_url($_GET['return_url']);
+            $form .= '<input type="hidden" name="return_url" value="' . $return_url . '">';
+        }
+
+        if (isset($_GET['original_post_id'])) {
+            $post_id = intval($_GET['original_post_id']);
+            $form .= '<input type="hidden" name="original_post_id" value="' . $post_id . '">';
+        }
+
+        $form .= '<input type="hidden" name="runthings_taxonomy_based_password_form" value="login_form">';
+
+        $form .= '</form>';
 
         return $form;
     }
@@ -86,14 +104,38 @@ class Authentication
      */
     private function set_cookie($password, $term_id)
     {
-        global $wp_hasher;
-        if (empty($wp_hasher)) {
-            require_once ABSPATH . 'wp-includes/class-phpass.php';
-            $wp_hasher = new \PasswordHash(8, true);
-        }
-        $hashed_password = $wp_hasher->HashPassword($password);
+        $hashed_password = hash('sha256', $password);
         $cookie_name = 'runthings_taxonomy_based_password' . COOKIEHASH;
         $cookie_value = json_encode(['term_id' => $term_id, 'password' => $hashed_password]);
-        setcookie($cookie_name, $cookie_value, time() + 864000, COOKIEPATH);
+        $expiration_time = 12 * 30 * 24 * 60 * 60; // 12 months
+        setcookie($cookie_name, $cookie_value, time() + $expiration_time, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+    }
+
+    /**
+     * Get the term ID for a post based on the attached taxonomy term
+     */
+    private function get_term_id($post_id)
+    {
+        $terms = wp_get_post_terms($post_id, $this->config->taxonomy, ['fields' => 'ids']);
+
+        if (is_wp_error($terms) || empty($terms)) {
+            return false;
+        }
+
+        return $terms[0];
+    }
+
+    /**
+     * Get the valid password for a post based on the attached taxonomy term
+     */
+    private function get_valid_password($term_id)
+    {
+        if (!$term_id) {
+            return '';
+        }
+
+        $password = get_term_meta($term_id, 'password', true);
+
+        return $password;
     }
 }

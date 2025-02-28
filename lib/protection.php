@@ -32,7 +32,13 @@ class Protection
                 // Add the current URL as a return URL parameter
                 global $wp;
                 $current_url = home_url(add_query_arg([], $wp->request));
-                $login_url = add_query_arg('return', urlencode($current_url), $login_url);
+                $login_url = add_query_arg(
+                    [
+                        'return_url' => urlencode($current_url),
+                        'original_post_id' => get_the_ID()
+                    ],
+                    $login_url
+                );
             } else {
                 // Fallback url
                 $login_url = home_url();
