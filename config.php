@@ -24,9 +24,4 @@ class Config
      * Taxonomy to use for password protection
      */
     public $taxonomy = 'grower_contract';
-
-    /**
-     * Cookie name
-     */
-    public $cookie_name = 'runthings_taxonomy_based_password' . COOKIEHASH;
 }

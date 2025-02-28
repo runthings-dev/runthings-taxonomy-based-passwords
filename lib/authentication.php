@@ -5,10 +5,12 @@ namespace RunThingsTaxonomyBasedPassword;
 class Authentication
 {
     private $config;
+    private $cookies;
 
     public function __construct($config)
     {
         $this->config = $config;
+        $this->cookies = new Cookies();
 
         // Add shortcodes
         add_shortcode('runthings_taxonomy_login_form', [$this, 'render_login_form']);
@@ -47,7 +49,7 @@ class Authentication
 
         if (hash_equals($valid_password, $password)) {
             // Password is correct
-            $this->set_cookie($password, $term_id);
+            $this->cookies->set_cookie($password, $term_id);
             wp_safe_redirect($return_url);
             exit;
         }
@@ -68,7 +70,7 @@ class Authentication
     public function handle_logout()
     {
         if (isset($_GET['runthings_taxonomy_logout'])) {
-            $this->clear_cookie();
+            $this->cookies->clear_cookie();
             wp_safe_redirect(home_url());
             exit;
         }
@@ -120,39 +122,12 @@ class Authentication
      */
     public function render_logout_link($atts)
     {
-        if ($this->is_logged_in()) {
+        if ($this->cookies->is_logged_in()) {
             $logout_url = add_query_arg('runthings_taxonomy_logout', 'true', home_url());
             return '<a href="' . esc_url($logout_url) . '">' . __('Log out') . '</a>';
         }
 
         return '';
-    }
-
-    /**
-     * Set the cookie object
-     */
-    private function set_cookie($password, $term_id)
-    {
-        $hashed_password = hash('sha256', $password);
-        $cookie_value = json_encode(['term_id' => $term_id, 'password' => $hashed_password]);
-        $expiration_time = 12 * 30 * 24 * 60 * 60; // 12 months
-        setcookie($this->config->cookie_name, $cookie_value, time() + $expiration_time, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
-    }
-
-    /**
-     * Clear the cookie
-     */
-    private function clear_cookie()
-    {
-        setcookie($this->config->cookie_name, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
-    }
-
-    /**
-     * Check if the user is logged in
-     */
-    private function is_logged_in()
-    {
-        return isset($_COOKIE[$this->config->cookie_name]);
     }
 
     /**
