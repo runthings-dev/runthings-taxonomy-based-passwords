@@ -50,6 +50,17 @@ class Protection
 
     private function check_for_authentication(): void
     {
+        if (is_user_logged_in()) {
+            $user = wp_get_current_user();
+            $user_roles = $user->roles;
+
+            foreach ($user_roles as $role) {
+                if (in_array($role, $this->config->exempt_roles)) {
+                    return; // User is in an exempt role
+                }
+            }
+        }
+
         if ($this->cookies->is_logged_in()) {
             $cookie_value = $this->cookies->get_cookie_value();
             $term_id = $cookie_value['term_id'];
