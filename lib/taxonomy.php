@@ -150,7 +150,7 @@ class Taxonomy
         <div class="form-field term-password-wrap">
             <label for="term-password"><?php _e('Password', 'runthings'); ?></label>
             <input type="text" name="term_password" id="term-password" value="" />
-            <p class="description"><?php _e('Enter a password for this term.', 'runthings'); ?></p>
+            <p class="description"><?php _e('Enter a password to protect items tagged with this term.', 'runthings'); ?></p>
         </div>
     <?php
     }
@@ -160,13 +160,12 @@ class Taxonomy
      */
     public function edit_password_field(\WP_Term $term): void
     {
-        $password = get_term_meta($term->term_id, 'runthings_taxonomy_password', true);
     ?>
         <tr class="form-field term-password-wrap">
             <th scope="row"><label for="term-password"><?php _e('Password', 'runthings'); ?></label></th>
             <td>
-                <input type="text" name="term_password" id="term-password" value="<?php echo esc_attr($password); ?>" />
-                <p class="description"><?php _e('Enter a password for this term.', 'runthings'); ?></p>
+                <input type="text" name="term_password" id="term-password" value="" placeholder="<?php _e('Enter new password', 'runthings'); ?>" />
+                <p class="description"><?php _e('Leave blank to keep the existing password.', 'runthings'); ?></p>
             </td>
         </tr>
 <?php
@@ -177,8 +176,17 @@ class Taxonomy
      */
     public function save_password_field(int $term_id): void
     {
-        if (isset($_POST['term_password'])) {
-            update_term_meta($term_id, 'runthings_taxonomy_password', sanitize_text_field($_POST['term_password']));
+        if (!isset($_POST['term_password'])) {
+            return;
+        }
+
+        $new_password = trim($_POST['term_password']);
+        $existing_hashed_password = get_term_meta($term_id, 'runthings_taxonomy_password', true);
+
+        // Only update if password is non-empty and different from the stored hash            
+        if (!empty($new_password) && !password_verify($new_password, $existing_hashed_password)) {
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            update_term_meta($term_id, 'runthings_taxonomy_password', $hashed_password);
         }
     }
 }

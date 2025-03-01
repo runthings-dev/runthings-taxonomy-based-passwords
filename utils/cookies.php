@@ -14,9 +14,8 @@ class Cookies
     /**
      * Set the cookie
      */
-    public function set_cookie(string $password, int $term_id): void
+    public function set_cookie(string $hashed_password, int $term_id): void
     {
-        $hashed_password = hash('sha256', $password);
         $cookie_value = json_encode(['term_id' => $term_id, 'password' => $hashed_password]);
         $expiration_time = 12 * 30 * 24 * 60 * 60; // 12 months
         setcookie($this->cookie_name, $cookie_value, time() + $expiration_time, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);

@@ -50,7 +50,7 @@ class Protection
 
     private function check_for_authentication(): void
     {
-        if (is_user_logged_in()) {
+        if (!empty($this->config->exempt_roles) && is_user_logged_in()) {
             $user = wp_get_current_user();
             $user_roles = $user->roles;
 
@@ -64,16 +64,16 @@ class Protection
         if ($this->cookies->is_logged_in()) {
             $cookie_value = $this->cookies->get_cookie_value();
             $term_id = $cookie_value['term_id'];
-            $password = $cookie_value['password'];
+            $cookie_hashed_password = $cookie_value['password'];
 
             $current_term_id = $this->get_current_term_id();
             if ($current_term_id !== $term_id) {
                 $this->redirect_to_login();
             }
 
-            $valid_password = $this->get_valid_password($current_term_id);
+            $stored_hashed_password = $this->get_valid_password($current_term_id);
 
-            if (hash_equals($valid_password, $password)) {
+            if ($this->verify_hashed_password($cookie_hashed_password, $stored_hashed_password)) {
                 return; // User is authenticated
             }
         }
@@ -120,16 +120,26 @@ class Protection
     /**
      * Get the valid password for a post based on the attached taxonomy term
      */
-    private function get_valid_password(?int $term_id): string
+    private function get_valid_password(int $term_id): string
     {
         if (!$term_id) {
             return '';
         }
 
-        $password = get_term_meta($term_id, 'runthings_taxonomy_password', true);
-
-        $hashed_password = hash('sha256', $password);
+        $hashed_password = get_term_meta($term_id, 'runthings_taxonomy_password', true);
 
         return $hashed_password;
+    }
+
+    /**
+     * Verifies a hashed password against the stored hash
+     */
+    public function verify_hashed_password(string $cookie_hashed_password, string $stored_hashed_password): bool
+    {
+        if (!$stored_hashed_password || !$cookie_hashed_password) {
+            return false; // No password stored
+        }
+
+        return hash_equals($stored_hashed_password, $cookie_hashed_password);
     }
 }
