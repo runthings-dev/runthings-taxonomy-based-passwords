@@ -88,7 +88,7 @@ class Runthings_Taxonomy_Based_Passwords
             'hub_object_id' => 0,
             'login_page_id' => 0,
             'objects' => [],
-            'exempt_roles' => ['administrator', 'editor'],
+            'exempt_roles' => ['administrator', 'editor', 'shop_manager'],
         ];
 
         if (!get_option('runthings_taxonomy_based_passwords_settings')) {
@@ -126,7 +126,9 @@ class Runthings_Taxonomy_Based_Passwords
 }
 
 // Initialize the plugin
-new Runthings_Taxonomy_Based_Passwords();
+add_action('plugins_loaded', function () {
+    new Runthings_Taxonomy_Based_Passwords();
+});
 
 // Register activation hook
 register_activation_hook(__FILE__, ['RunthingsTaxonomyBasedPasswords\Runthings_Taxonomy_Based_Passwords', 'activate']);
