@@ -45,9 +45,13 @@ class Protection
         $post_type = get_post_type();
 
         if ($this->is_protected_object($post_type) && !$this->cookies->is_logged_in()) {
-            // must redirect to home, there is no individual term attached to 
+            // must redirect to home or hub, there is no individual term attached to
             // an archive page to check against
-            wp_redirect(home_url());
+            if ($this->config->archive_redirect === 'hub' && $this->config->hub_object_id && get_post_status($this->config->hub_object_id) === 'publish') {
+                wp_redirect(get_permalink($this->config->hub_object_id));
+            } else {
+                wp_redirect(home_url());
+            }
             exit;
         }
     }

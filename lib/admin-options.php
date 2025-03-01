@@ -67,6 +67,14 @@ class AdminOptions
             'runthings-taxonomy-based-passwords',
             'runthings_taxonomy_based_passwords_section'
         );
+
+        add_settings_field(
+            'archive_redirect',
+            __('Archive Redirect', 'runthings-taxonomy-based-passwords'),
+            [$this, 'render_archive_redirect_field'],
+            'runthings-taxonomy-based-passwords',
+            'runthings_taxonomy_based_passwords_section'
+        );
     }
 
     public function render_settings_page(): void
@@ -170,6 +178,24 @@ class AdminOptions
             <?php
             }
             ?>
+        </fieldset>
+    <?php
+    }
+
+    public function render_archive_redirect_field(): void
+    {
+        $options = get_option('runthings_taxonomy_based_passwords_settings');
+        $archive_redirect = $options['archive_redirect'] ?? 'hub';
+    ?>
+        <fieldset>
+            <label>
+                <input type="radio" name="runthings_taxonomy_based_passwords_settings[archive_redirect]" value="hub" <?php checked($archive_redirect, 'hub'); ?>>
+                <?php _e('Redirect to Hub Page', 'runthings-taxonomy-based-passwords'); ?>
+            </label><br>
+            <label>
+                <input type="radio" name="runthings_taxonomy_based_passwords_settings[archive_redirect]" value="home" <?php checked($archive_redirect, 'home'); ?>>
+                <?php _e('Redirect to Home Page', 'runthings-taxonomy-based-passwords'); ?>
+            </label>
         </fieldset>
 <?php
     }

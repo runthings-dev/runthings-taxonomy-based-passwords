@@ -33,6 +33,11 @@ class Config
     public string $taxonomy = 'grower_contract';
 
     /**
+     * Archive redirect option (home page or hub page)
+     */
+    public string $archive_redirect;
+
+    /**
      * Capabilities (static for the plugin activate hook to scaffold them)
      */
     public static string $manage_options_capability = 'runthings_tbp_manage_options';
@@ -46,5 +51,6 @@ class Config
         $this->login_page_id = (int) ($settings['login_page_id'] ?? Config::PAGE_ID_NOT_SET);
         $this->objects = $settings['objects'] ?? [];
         $this->exempt_roles = $settings['exempt_roles'] ?? [];
+        $this->archive_redirect = $settings['archive_redirect'] ?? 'hub';
     }
 }

@@ -98,6 +98,7 @@ class Runthings_Taxonomy_Based_Passwords
             'login_page_id' => 0,
             'objects' => [],
             'exempt_roles' => ['administrator', 'editor', 'shop_manager'],
+            'archive_redirect' => 'hub',
         ];
 
         if (!get_option('runthings_taxonomy_based_passwords_settings')) {
