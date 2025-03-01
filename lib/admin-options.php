@@ -150,16 +150,18 @@ class AdminOptions
     {
         $options = get_option('runthings_taxonomy_based_passwords_settings');
         $selected_roles = isset($options['exempt_roles']) ? $options['exempt_roles'] : [];
-        global $wp_roles;
 
-        // Sort roles alphabetically by name
-        uasort($wp_roles->roles, function ($a, $b) {
+        global $wp_roles;
+        $roles = $wp_roles->roles;
+
+        // Sort it alphabetically by name
+        uasort($roles, function ($a, $b) {
             return strcmp($a['name'], $b['name']);
         });
     ?>
         <fieldset>
             <?php
-            foreach ($wp_roles->roles as $role_key => $role) {
+            foreach ($roles as $role_key => $role) {
             ?>
                 <label>
                     <input type="checkbox" name="runthings_taxonomy_based_passwords_settings[exempt_roles][]" value="<?php echo esc_attr($role_key); ?>" <?php checked(in_array($role_key, $selected_roles)); ?>>
