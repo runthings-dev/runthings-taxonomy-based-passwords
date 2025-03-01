@@ -14,6 +14,7 @@ class Protection
 
         // Add protection
         add_action('template_redirect', [$this, 'single_protection']);
+        add_action('template_redirect', [$this, 'archive_protection']); // Add archive protection
     }
 
     /**
@@ -29,6 +30,25 @@ class Protection
 
         if ($this->is_protected_object($post_type) || $this->is_child_of_hub_object($post_type)) {
             $this->check_for_authentication();
+        }
+    }
+
+    /**
+     * Protect archive pages
+     */
+    public function archive_protection(): void
+    {
+        if (!is_archive() || is_admin()) {
+            return;
+        }
+
+        $post_type = get_post_type();
+
+        if ($this->is_protected_object($post_type) && !$this->cookies->is_logged_in()) {
+            // must redirect to home, there is no individual term attached to 
+            // an archive page to check against
+            wp_redirect(home_url());
+            exit;
         }
     }
 
