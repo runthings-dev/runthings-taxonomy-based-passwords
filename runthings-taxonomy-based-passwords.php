@@ -99,6 +99,7 @@ class Runthings_Taxonomy_Based_Passwords
             'objects' => [],
             'exempt_roles' => ['administrator', 'editor', 'shop_manager'],
             'archive_redirect' => 'hub',
+            'delete_data_on_uninstall' => true, // Set the default value for the new setting
         ];
 
         if (!get_option('runthings_taxonomy_based_passwords_settings')) {
@@ -110,7 +111,10 @@ class Runthings_Taxonomy_Based_Passwords
 
     public static function uninstall(): void
     {
-        delete_option('runthings_taxonomy_based_passwords_settings');
+        $settings = get_option('runthings_taxonomy_based_passwords_settings');
+        if (!empty($settings) && (bool) $settings['delete_data_on_uninstall']) {
+            delete_option('runthings_taxonomy_based_passwords_settings');
+        }
     }
 
     private static function add_custom_capabilities()

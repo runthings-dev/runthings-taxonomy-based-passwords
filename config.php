@@ -38,6 +38,11 @@ class Config
     public string $archive_redirect;
 
     /**
+     * Delete all data on uninstall
+     */
+    public bool $delete_data_on_uninstall;
+
+    /**
      * Capabilities (static for the plugin activate hook to scaffold them)
      */
     public static string $manage_options_capability = 'runthings_tbp_manage_options';
@@ -52,5 +57,6 @@ class Config
         $this->objects = $settings['objects'] ?? [];
         $this->exempt_roles = $settings['exempt_roles'] ?? [];
         $this->archive_redirect = $settings['archive_redirect'] ?? 'hub';
+        $this->delete_data_on_uninstall = (bool) ($settings['delete_data_on_uninstall'] ?? true);
     }
 }

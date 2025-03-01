@@ -75,6 +75,14 @@ class AdminOptions
             'runthings-taxonomy-based-passwords',
             'runthings_taxonomy_based_passwords_section'
         );
+
+        add_settings_field(
+            'delete_data_on_uninstall',
+            __('Delete All Data on Uninstall', 'runthings-taxonomy-based-passwords'),
+            [$this, 'render_delete_data_on_uninstall_field'],
+            'runthings-taxonomy-based-passwords',
+            'runthings_taxonomy_based_passwords_section'
+        );
     }
 
     public function render_settings_page(): void
@@ -195,6 +203,20 @@ class AdminOptions
             <label>
                 <input type="radio" name="runthings_taxonomy_based_passwords_settings[archive_redirect]" value="home" <?php checked($archive_redirect, 'home'); ?>>
                 <?php _e('Redirect to Home Page', 'runthings-taxonomy-based-passwords'); ?>
+            </label>
+        </fieldset>
+    <?php
+    }
+
+    public function render_delete_data_on_uninstall_field(): void
+    {
+        $options = get_option('runthings_taxonomy_based_passwords_settings');
+        $delete_data_on_uninstall = isset($options['delete_data_on_uninstall']) ? (bool) $options['delete_data_on_uninstall'] : true;
+    ?>
+        <fieldset>
+            <label>
+                <input type="checkbox" name="runthings_taxonomy_based_passwords_settings[delete_data_on_uninstall]" value="1" <?php checked($delete_data_on_uninstall, true); ?>>
+                <?php _e('Delete all data on uninstall', 'runthings-taxonomy-based-passwords'); ?>
             </label>
         </fieldset>
 <?php
