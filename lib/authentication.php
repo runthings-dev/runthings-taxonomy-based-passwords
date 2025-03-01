@@ -32,6 +32,10 @@ class Authentication
             return;
         }
 
+        if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'runthings_taxonomy_based_passwords_login_form')) {
+            return;
+        }
+
         if (!isset($_POST['post_password']) || !isset($_POST['return_url']) || !isset($_POST['original_post_id'])) {
             return;
         }
@@ -113,6 +117,7 @@ class Authentication
         }
 
         $form .= '<input type="hidden" name="runthings_taxonomy_based_password_form" value="login_form">';
+        $form .= wp_nonce_field('runthings_taxonomy_based_passwords_login_form', '_wpnonce', true, false);
 
         $form .= '</form>';
 
