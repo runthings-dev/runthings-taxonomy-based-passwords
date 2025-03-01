@@ -50,9 +50,10 @@ require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/archive.php';
 
 class Runthings_Taxonomy_Based_Passwords
 {
+    private static ?Runthings_Taxonomy_Based_Passwords $instance = null;
     private Config $config;
 
-    public function __construct()
+    private function __construct()
     {
         $this->config = new Config();
 
@@ -64,6 +65,14 @@ class Runthings_Taxonomy_Based_Passwords
 
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
         add_action('admin_notices', [$this, 'check_login_page_set']);
+    }
+
+    public static function get_instance(): Runthings_Taxonomy_Based_Passwords
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
     public function add_settings_link(array $links): array
@@ -127,7 +136,7 @@ class Runthings_Taxonomy_Based_Passwords
 
 // Initialize the plugin
 add_action('plugins_loaded', function () {
-    new Runthings_Taxonomy_Based_Passwords();
+    Runthings_Taxonomy_Based_Passwords::get_instance();
 });
 
 // Register activation hook
