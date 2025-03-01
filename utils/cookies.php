@@ -1,6 +1,6 @@
 <?php
 
-namespace RunThingsTaxonomyBasedPassword;
+namespace RunthingsTaxonomyBasedPasswords;
 
 class Cookies
 {
@@ -8,7 +8,7 @@ class Cookies
 
     public function __construct()
     {
-        $this->cookie_name = 'runthings_taxonomy_based_password' . COOKIEHASH;
+        $this->cookie_name = 'runthings_taxonomy_based_passwords' . COOKIEHASH;
     }
 
     /**

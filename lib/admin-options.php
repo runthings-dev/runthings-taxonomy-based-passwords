@@ -1,6 +1,6 @@
 <?php
 
-namespace RunThingsTaxonomyBasedPassword;
+namespace RunthingsTaxonomyBasedPasswords;
 
 class AdminOptions
 {
@@ -73,7 +73,7 @@ class AdminOptions
     {
 ?>
         <div class="wrap">
-            <h1>RunThings Taxonomy-Based Passwords</h1>
+            <h1>Taxonomy-Based Passwords</h1>
             <form method="post" action="options.php">
                 <?php
                 settings_fields('runthings_taxonomy_based_passwords');

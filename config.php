@@ -1,6 +1,6 @@
 <?php
 
-namespace RunThingsTaxonomyBasedPassword;
+namespace RunthingsTaxonomyBasedPasswords;
 
 class Config
 {

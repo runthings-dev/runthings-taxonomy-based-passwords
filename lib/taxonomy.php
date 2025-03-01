@@ -1,6 +1,6 @@
 <?php
 
-namespace RunThingsTaxonomyBasedPassword;
+namespace RunthingsTaxonomyBasedPasswords;
 
 class Taxonomy
 {
@@ -67,7 +67,7 @@ class Taxonomy
         if (get_post_type() === $this->config->hub_object) {
             global $post;
 
-            if (!$this->is_hub_child($post)) {
+            if (!$this->is_child_of_hub_object($post)) {
                 return;
             }
 
