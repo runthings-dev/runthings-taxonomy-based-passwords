@@ -33,9 +33,10 @@ class Config
     public string $taxonomy = 'grower_contract';
 
     /**
-     * Admin menu capability
+     * Capabilities (static for the plugin activate hook to scaffold them)
      */
-    public string $admin_options_capability = 'edit_pages';
+    public static string $manage_options_capability = 'runthings_tbp_manage_options';
+    public static string $set_passwords_capability = 'runthings_tbp_set_passwords';
 
     public function __construct()
     {

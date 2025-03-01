@@ -16,10 +16,12 @@ class Taxonomy
         add_action('save_post', [$this, 'save_grower_contract_meta_box']);
 
         // Add custom password field to the taxonomy terms
-        add_action('grower_contract_add_form_fields', [$this, 'add_password_field']);
-        add_action('grower_contract_edit_form_fields', [$this, 'edit_password_field']);
-        add_action('created_grower_contract', [$this, 'save_password_field']);
-        add_action('edited_grower_contract', [$this, 'save_password_field']);
+        if (current_user_can(Config::$set_passwords_capability)) {
+            add_action('grower_contract_add_form_fields', [$this, 'add_password_field']);
+            add_action('grower_contract_edit_form_fields', [$this, 'edit_password_field']);
+            add_action('created_grower_contract', [$this, 'save_password_field']);
+            add_action('edited_grower_contract', [$this, 'save_password_field']);
+        }
     }
 
     /**

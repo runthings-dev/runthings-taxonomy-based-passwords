@@ -19,7 +19,7 @@ class AdminOptions
             'options-general.php', // Parent slug
             __('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords'), // Page title
             __('Taxonomy Passwords', 'runthings-taxonomy-based-passwords'), // Menu title
-            $this->config->admin_options_capability, // Capability
+            Config::$manage_options_capability, // Capability
             'runthings-taxonomy-based-passwords', // Menu slug
             [$this, 'render_settings_page'] // Callback function
         );

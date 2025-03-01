@@ -38,7 +38,6 @@ if (!defined('ABSPATH')) {
 define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL', plugin_dir_url(__FILE__));
 define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR', plugin_dir_path(__FILE__));
 
-
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'config.php';
 
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'utils/cookies.php';
@@ -95,11 +94,34 @@ class Runthings_Taxonomy_Based_Passwords
         if (!get_option('runthings_taxonomy_based_passwords_settings')) {
             update_option('runthings_taxonomy_based_passwords_settings', $default_settings);
         }
+
+        self::add_custom_capabilities();
     }
 
     public static function uninstall(): void
     {
         delete_option('runthings_taxonomy_based_passwords_settings');
+    }
+
+    private static function add_custom_capabilities()
+    {
+        $roles = ['administrator', 'editor', 'shop_manager'];
+
+        foreach ($roles as $role_name) {
+            $role = get_role($role_name);
+
+            if (!$role) {
+                continue; // Skip if the role doesn't exist
+            }
+
+            if (!$role->has_cap(Config::$manage_options_capability)) {
+                $role->add_cap(Config::$manage_options_capability);
+            }
+
+            if (!$role->has_cap(Config::$set_passwords_capability)) {
+                $role->add_cap(Config::$set_passwords_capability);
+            }
+        }
     }
 }
 
