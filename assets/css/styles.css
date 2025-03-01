@@ -1,0 +1,15 @@
+.runthings-taxonomy-based-passwords-error {
+  padding: 15px;
+  margin: 10px 0;
+  border-left: 4px solid #dc3232;
+  background-color: #ffebe8;
+  color: #dc3232;
+}
+
+.runthings-taxonomy-based-passwords-error p:last-child {
+  margin-bottom: 0;
+}
+
+.runthings-taxonomy-based-passwords-login-form input {
+  margin-top: 0.5rem;
+}

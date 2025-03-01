@@ -87,6 +87,8 @@ class Authentication
      */
     public function render_login_form(array $atts): string
     {
+        wp_enqueue_style('runthings-taxonomy-based-passwords-styles', RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL . 'assets/css/styles.css');
+
         $field_id = 'pwbox-' . rand();
         $invalid_password = __('The password you entered is incorrect.');
         $invalid_password_html = '';
@@ -100,7 +102,7 @@ class Authentication
             $aria = ' aria-describedby="error-' . $field_id . '"';
         }
 
-        $form = '<form method="post" class="post-password-form' . $class . '"> ' . $invalid_password_html;
+        $form = '<form method="post" class="post-password-form runthings-taxonomy-based-passwords-login-form' . $class . '"> ' . $invalid_password_html;
         $form .= '<p>' . __('This content is restricted to contracted growers. Please enter your password to view it.') . '</p>';
         $form .= '<p><label for="' . $field_id . '">' . __('Password:') . ' <input name="post_password" id="' . $field_id . '" type="password" spellcheck="false" required  size="20" ' . $aria . ' /></label>';
         $form .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter') . '" /></p>';
