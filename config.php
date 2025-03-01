@@ -4,6 +4,8 @@ namespace RunthingsTaxonomyBasedPasswords;
 
 class Config
 {
+    private const PAGE_ID_NOT_SET = 0;
+
     /**
      * Hub object that is the parent of the protected pages
      */
@@ -39,8 +41,8 @@ class Config
     {
         $settings = get_option('runthings_taxonomy_based_passwords_settings', []);
 
-        $this->hub_object_id = (int) ($settings['hub_object_id'] ?? 0);
-        $this->login_page_id = (int) ($settings['login_page_id'] ?? 0);
+        $this->hub_object_id = (int) ($settings['hub_object_id'] ?? Config::PAGE_ID_NOT_SET);
+        $this->login_page_id = (int) ($settings['login_page_id'] ?? Config::PAGE_ID_NOT_SET);
         $this->objects = $settings['objects'] ?? [];
         $this->exempt_roles = $settings['exempt_roles'] ?? [];
     }
