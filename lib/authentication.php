@@ -94,8 +94,8 @@ class Authentication
         $class = '';
 
         // Set Up error message if present
-        if (isset($_GET['error']) && $_GET['error'] === 'incorrect_password') {
-            $invalid_password_html = '<div class="post-password-form-invalid-password" role="alert"><p id="error-' . $field_id . '">' . $invalid_password . '</p></div>';
+        if (isset($_REQUEST['error']) && $_REQUEST['error'] === 'incorrect_password') {
+            $invalid_password_html = '<div class="runthings-taxonomy-based-passwords-error" role="alert"><p id="error-' . $field_id . '">' . $invalid_password . '</p></div>';
             $class = ' password-form-error';
             $aria = ' aria-describedby="error-' . $field_id . '"';
         }
