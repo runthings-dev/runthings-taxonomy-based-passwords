@@ -17,8 +17,8 @@ class AdminOptions
     {
         add_submenu_page(
             'options-general.php', // Parent slug
-            'Taxonomy-Based Passwords', // Page title
-            'Taxonomy Passwords', // Menu title
+            __('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords'), // Page title
+            __('Taxonomy Passwords', 'runthings-taxonomy-based-passwords'), // Menu title
             $this->config->admin_options_capability, // Capability
             'runthings-taxonomy-based-passwords', // Menu slug
             [$this, 'render_settings_page'] // Callback function
@@ -31,14 +31,14 @@ class AdminOptions
 
         add_settings_section(
             'runthings_taxonomy_based_passwords_section',
-            'Settings',
+            __('Settings', 'runthings-taxonomy-based-passwords'),
             null,
             'runthings-taxonomy-based-passwords'
         );
 
         add_settings_field(
             'hub_object_id',
-            'Hub Page',
+            __('Hub Page', 'runthings-taxonomy-based-passwords'),
             [$this, 'render_hub_object_id_field'],
             'runthings-taxonomy-based-passwords',
             'runthings_taxonomy_based_passwords_section'
@@ -46,7 +46,7 @@ class AdminOptions
 
         add_settings_field(
             'login_page_id',
-            'Login Page',
+            __('Login Page', 'runthings-taxonomy-based-passwords'),
             [$this, 'render_login_page_id_field'],
             'runthings-taxonomy-based-passwords',
             'runthings_taxonomy_based_passwords_section'
@@ -54,7 +54,7 @@ class AdminOptions
 
         add_settings_field(
             'objects',
-            'Post Types to Protect',
+            __('Post Types to Protect', 'runthings-taxonomy-based-passwords'),
             [$this, 'render_objects_field'],
             'runthings-taxonomy-based-passwords',
             'runthings_taxonomy_based_passwords_section'
@@ -62,7 +62,7 @@ class AdminOptions
 
         add_settings_field(
             'exempt_roles',
-            'Exempt Roles',
+            __('Exempt Roles', 'runthings-taxonomy-based-passwords'),
             [$this, 'render_exempt_roles_field'],
             'runthings-taxonomy-based-passwords',
             'runthings_taxonomy_based_passwords_section'
@@ -73,7 +73,7 @@ class AdminOptions
     {
 ?>
         <div class="wrap">
-            <h1>Taxonomy-Based Passwords</h1>
+            <h1><?php _e('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords'); ?></h1>
             <form method="post" action="options.php">
                 <?php
                 settings_fields('runthings_taxonomy_based_passwords');
@@ -90,7 +90,7 @@ class AdminOptions
         $options = get_option('runthings_taxonomy_based_passwords_settings');
     ?>
         <select id="hub_object_id" name="runthings_taxonomy_based_passwords_settings[hub_object_id]" class="select2">
-            <option value="0" <?php selected($options['hub_object_id'], 0); ?>><?php _e('Please select', 'runthings-dodd-sculptor-profiles-sitemap'); ?></option>
+            <option value="0" <?php selected($options['hub_object_id'], 0); ?>><?php _e('Please select', 'runthings-taxonomy-based-passwords'); ?></option>
             <?php
             $pages = get_posts(['post_type' => 'page', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC']);
             foreach ($pages as $page) {
@@ -106,7 +106,7 @@ class AdminOptions
         $options = get_option('runthings_taxonomy_based_passwords_settings');
     ?>
         <select id="login_page_id" name="runthings_taxonomy_based_passwords_settings[login_page_id]" class="select2">
-            <option value="0" <?php selected($options['login_page_id'], 0); ?>><?php _e('Please select', 'runthings-dodd-sculptor-profiles-sitemap'); ?></option>
+            <option value="0" <?php selected($options['login_page_id'], 0); ?>><?php _e('Please select', 'runthings-taxonomy-based-passwords'); ?></option>
             <?php
             $pages = get_posts(['post_type' => 'page', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC']);
             foreach ($pages as $page) {

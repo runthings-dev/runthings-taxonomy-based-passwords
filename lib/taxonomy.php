@@ -28,17 +28,17 @@ class Taxonomy
     public function register_grower_contract_taxonomy(): void
     {
         $labels = [
-            'name'              => _x('Grower Contracts', 'taxonomy general name', 'runthings'),
-            'singular_name'     => _x('Grower Contract', 'taxonomy singular name', 'runthings'),
-            'search_items'      => __('Search Grower Contracts', 'runthings'),
-            'all_items'         => __('All Grower Contracts', 'runthings'),
-            'parent_item'       => __('Parent Grower Contract', 'runthings'),
-            'parent_item_colon' => __('Parent Grower Contract:', 'runthings'),
-            'edit_item'         => __('Edit Grower Contract', 'runthings'),
-            'update_item'       => __('Update Grower Contract', 'runthings'),
-            'add_new_item'      => __('Add New Grower Contract', 'runthings'),
-            'new_item_name'     => __('New Grower Contract Name', 'runthings'),
-            'menu_name'         => __('Grower Contracts', 'runthings'),
+            'name'              => _x('Grower Contracts', 'taxonomy general name', 'runthings-taxonomy-based-passwords'),
+            'singular_name'     => _x('Grower Contract', 'taxonomy singular name', 'runthings-taxonomy-based-passwords'),
+            'search_items'      => __('Search Grower Contracts', 'runthings-taxonomy-based-passwords'),
+            'all_items'         => __('All Grower Contracts', 'runthings-taxonomy-based-passwords'),
+            'parent_item'       => __('Parent Grower Contract', 'runthings-taxonomy-based-passwords'),
+            'parent_item_colon' => __('Parent Grower Contract:', 'runthings-taxonomy-based-passwords'),
+            'edit_item'         => __('Edit Grower Contract', 'runthings-taxonomy-based-passwords'),
+            'update_item'       => __('Update Grower Contract', 'runthings-taxonomy-based-passwords'),
+            'add_new_item'      => __('Add New Grower Contract', 'runthings-taxonomy-based-passwords'),
+            'new_item_name'     => __('New Grower Contract Name', 'runthings-taxonomy-based-passwords'),
+            'menu_name'         => __('Grower Contracts', 'runthings-taxonomy-based-passwords'),
         ];
 
         $args = [
@@ -82,7 +82,7 @@ class Taxonomy
     {
         add_meta_box(
             'grower_contract_meta_box',
-            __('Grower Contract', 'runthings'),
+            __('Grower Contract', 'runthings-taxonomy-based-passwords'),
             [$this, 'render_grower_contract_meta_box'],
             $post_type,
             'side',
@@ -105,7 +105,7 @@ class Taxonomy
         $selected_term = !empty($selected_term) ? $selected_term[0] : '';
 
         echo '<select name="grower_contract_term" id="grower_contract_term">';
-        echo '<option value="">' . __('Select Grower Contract', 'runthings') . '</option>';
+        echo '<option value="">' . __('Select Grower Contract', 'runthings-taxonomy-based-passwords') . '</option>';
         foreach ($terms as $term) {
             echo '<option value="' . esc_attr($term->term_id) . '" ' . selected($selected_term, $term->term_id, false) . '>' . esc_html($term->name) . '</option>';
         }
@@ -150,9 +150,9 @@ class Taxonomy
     {
 ?>
         <div class="form-field term-password-wrap">
-            <label for="term-password"><?php _e('Password', 'runthings'); ?></label>
+            <label for="term-password"><?php _e('Password', 'runthings-taxonomy-based-passwords'); ?></label>
             <input type="text" name="term_password" id="term-password" value="" />
-            <p class="description"><?php _e('Enter a password to protect items tagged with this term.', 'runthings'); ?></p>
+            <p class="description"><?php _e('Enter a password to protect items tagged with this term.', 'runthings-taxonomy-based-passwords'); ?></p>
             <?php wp_nonce_field('runthings_taxonomy_based_passwords_add_term', '_wpnonce'); ?>
         </div>
     <?php
@@ -165,10 +165,10 @@ class Taxonomy
     {
     ?>
         <tr class="form-field term-password-wrap">
-            <th scope="row"><label for="term-password"><?php _e('Password', 'runthings'); ?></label></th>
+            <th scope="row"><label for="term-password"><?php _e('Password', 'runthings-taxonomy-based-passwords'); ?></label></th>
             <td>
-                <input type="text" name="term_password" id="term-password" value="" placeholder="<?php _e('Enter new password', 'runthings'); ?>" />
-                <p class="description"><?php _e('Leave blank to keep the existing password.', 'runthings'); ?></p>
+                <input type="text" name="term_password" id="term-password" value="" placeholder="<?php _e('Enter new password', 'runthings-taxonomy-based-passwords'); ?>" />
+                <p class="description"><?php _e('Leave blank to keep the existing password.', 'runthings-taxonomy-based-passwords'); ?></p>
                 <?php wp_nonce_field('runthings_taxonomy_based_passwords_edit_term', '_wpnonce'); ?>
             </td>
         </tr>

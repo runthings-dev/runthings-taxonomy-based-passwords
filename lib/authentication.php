@@ -90,7 +90,7 @@ class Authentication
         wp_enqueue_style('runthings-taxonomy-based-passwords-styles', RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL . 'assets/css/styles.css');
 
         $field_id = 'pwbox-' . rand();
-        $invalid_password = __('The password you entered is incorrect.');
+        $invalid_password = __('The password you entered is incorrect.', 'runthings-taxonomy-based-passwords');
         $invalid_password_html = '';
         $aria = '';
         $class = '';
@@ -103,9 +103,9 @@ class Authentication
         }
 
         $form = '<form method="post" class="post-password-form runthings-taxonomy-based-passwords-login-form' . $class . '"> ' . $invalid_password_html;
-        $form .= '<p>' . __('This content is restricted to contracted growers. Please enter your password to view it.') . '</p>';
-        $form .= '<p><label for="' . $field_id . '">' . __('Password:') . ' <input name="post_password" id="' . $field_id . '" type="password" spellcheck="false" required  size="20" ' . $aria . ' /></label>';
-        $form .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter') . '" /></p>';
+        $form .= '<p>' . __('This content is restricted to contracted growers. Please enter your password to view it.', 'runthings-taxonomy-based-passwords') . '</p>';
+        $form .= '<p><label for="' . $field_id . '">' . __('Password:', 'runthings-taxonomy-based-passwords') . ' <input name="post_password" id="' . $field_id . '" type="password" spellcheck="false" required  size="20" ' . $aria . ' /></label>';
+        $form .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter', 'runthings-taxonomy-based-passwords') . '" /></p>';
 
         // Add hidden fields for return URL and form type
         if (isset($_GET['return_url'])) {
@@ -133,7 +133,7 @@ class Authentication
     {
         if ($this->cookies->is_logged_in()) {
             $logout_url = add_query_arg('runthings_taxonomy_logout', 'true', home_url());
-            return '<a href="' . esc_url($logout_url) . '">' . __('Log out') . '</a>';
+            return '<a href="' . esc_url($logout_url) . '">' . __('Log out', 'runthings-taxonomy-based-passwords') . '</a>';
         }
 
         return '';
