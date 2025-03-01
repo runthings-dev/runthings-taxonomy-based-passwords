@@ -105,7 +105,7 @@ class Runthings_Taxonomy_Based_Passwords
 new Runthings_Taxonomy_Based_Passwords();
 
 // Register activation hook
-register_activation_hook(__FILE__, ['Runthings_Taxonomy_Based_Passwords', 'activate']);
+register_activation_hook(__FILE__, ['RunthingsTaxonomyBasedPasswords\Runthings_Taxonomy_Based_Passwords', 'activate']);
 
 // Register uninstall hook
-register_uninstall_hook(__FILE__, ['Runthings_Taxonomy_Based_Passwords', 'uninstall']);
+register_uninstall_hook(__FILE__, ['RunthingsTaxonomyBasedPasswords\Runthings_Taxonomy_Based_Passwords', 'uninstall']);
