@@ -160,7 +160,7 @@ class Taxonomy
         }
 
         $post = get_post($post_id);
-        if (!$this->is_child_of_hub_object($post)) {
+        if ($post->post_type === $this->config->hub_object && !$this->is_child_of_hub_object($post)) {
             return;
         }
 
@@ -168,6 +168,9 @@ class Taxonomy
             $term_id = intval($_POST['access_group_term']);
             if ($term_id) {
                 wp_set_post_terms($post_id, [$term_id], $this->config->taxonomy);
+            } else {
+                // TODO: clear existing protections
+                // wp_set_post_terms($post_id, [], $this->config->taxonomy);
             }
         }
     }
