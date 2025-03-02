@@ -65,10 +65,10 @@ class Config
         $this->objects = $settings['objects'] ?? [];
         $this->exempt_roles = $settings['exempt_roles'] ?? [];
         $this->archive_redirect = $settings['archive_redirect'] ?? 'hub';
-        $this->taxonomy = $settings['taxonomy'] ?? $this->taxonomy_default;
-        $this->taxonomy_slug = $settings['taxonomy_slug'] ?? $this->taxonomy_slug_default;
-        $this->taxonomy_singular = $settings['taxonomy_singular'] ?? $this->taxonomy_singular_default;
-        $this->taxonomy_plural = $settings['taxonomy_plural'] ?? $this->taxonomy_plural_default;
+        $this->taxonomy = !empty($settings['taxonomy']) ? $settings['taxonomy'] : $this->taxonomy_default;
+        $this->taxonomy_slug = !empty($settings['taxonomy_slug']) ? $settings['taxonomy_slug'] : $this->taxonomy_slug_default;
+        $this->taxonomy_singular = !empty($settings['taxonomy_singular']) ? $settings['taxonomy_singular'] : $this->taxonomy_singular_default;
+        $this->taxonomy_plural = !empty($settings['taxonomy_plural']) ? $settings['taxonomy_plural'] : $this->taxonomy_plural_default;
         $this->delete_data_on_uninstall = (bool) ($settings['delete_data_on_uninstall'] ?? true);
     }
 }
