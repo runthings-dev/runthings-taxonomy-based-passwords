@@ -22,6 +22,12 @@ class Taxonomy
             add_action("created_{$this->config->taxonomy}", [$this, 'save_password_field']);
             add_action("edited_{$this->config->taxonomy}", [$this, 'save_password_field']);
         }
+
+        // Customize admin columns titles
+        foreach ($this->config->objects as $post_type) {
+            add_filter("manage_edit-{$post_type}_columns", [$this, 'edit_taxonomy_column_title']);
+        }
+        add_filter("manage_edit-{$this->config->hub_object}_columns", [$this, 'edit_taxonomy_column_title']);
     }
 
     /**
@@ -169,8 +175,7 @@ class Taxonomy
             if ($term_id) {
                 wp_set_post_terms($post_id, [$term_id], $this->config->taxonomy);
             } else {
-                // TODO: clear existing protections
-                // wp_set_post_terms($post_id, [], $this->config->taxonomy);
+                wp_set_post_terms($post_id, [], $this->config->taxonomy);
             }
         }
     }
@@ -235,5 +240,16 @@ class Taxonomy
                 }
             }
         }
+    }
+
+    /**
+     * Edit title for the taxonomy column
+     */
+    public function edit_taxonomy_column_title(array $columns): array
+    {
+        if (isset($columns["taxonomy-{$this->config->taxonomy}"])) {
+            $columns["taxonomy-{$this->config->taxonomy}"] = $this->config->taxonomy_singular;
+        }
+        return $columns;
     }
 }
