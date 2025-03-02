@@ -102,8 +102,9 @@ class Authentication
             $aria = ' aria-describedby="error-' . $field_id . '"';
         }
 
-        $form = '<form method="post" class="post-password-form runthings-taxonomy-based-passwords-login-form' . $class . '"> ' . $invalid_password_html;
-        $form .= '<p>' . __('This content is restricted to contracted growers. Please enter your password to view it.', 'runthings-taxonomy-based-passwords') . '</p>';
+        $form = '<form method="post" class="post-password-form runthings-taxonomy-based-passwords-login-form' . $class . '"> ';
+        $form .= '<p>' . __('This content is restricted. Please enter your password to view it.', 'runthings-taxonomy-based-passwords') . '</p>';
+        $form .= $invalid_password_html;
         $form .= '<p><label for="' . $field_id . '">' . __('Password:', 'runthings-taxonomy-based-passwords') . ' <input name="post_password" id="' . $field_id . '" type="password" spellcheck="false" required  size="20" ' . $aria . ' /></label>';
         $form .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter', 'runthings-taxonomy-based-passwords') . '" /></p>';
 

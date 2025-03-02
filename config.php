@@ -31,6 +31,12 @@ class Config
      * Taxonomy to use for password protection
      */
     public string $taxonomy = 'grower_contract';
+    public string $taxonomy_slug = 'grower-contract';
+    public string $taxonomy_singular = 'Grower Contract';
+    public string $taxonomy_plural = 'Grower Contracts';
+
+    // public string $taxonomy = 'password_group';
+    // public string $taxonomy_slug = 'password-group';
 
     /**
      * Archive redirect option (home page or hub page)
@@ -43,7 +49,7 @@ class Config
     public bool $delete_data_on_uninstall;
 
     /**
-     * Capabilities (static for the plugin activate hook to scaffold them)
+     * Capabilities (static for the plugin 'activate' hook to be able to scaffold them)
      */
     public static string $manage_options_capability = 'runthings_tbp_manage_options';
     public static string $set_passwords_capability = 'runthings_tbp_set_passwords';
