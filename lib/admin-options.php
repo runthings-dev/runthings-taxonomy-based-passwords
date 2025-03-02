@@ -253,7 +253,12 @@ class AdminOptions
         $taxonomy = $options['taxonomy'] ?? $this->config->taxonomy_default;
     ?>
         <input type="text" id="taxonomy" name="runthings_taxonomy_based_passwords_settings[taxonomy]" value="<?php echo esc_attr($taxonomy); ?>" />
-        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_default) . "</code>"); ?></p>
+        <p class="description">
+            <?php
+            /* translators: %s is the default taxonomy ID */
+            printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_default) . "</code>");
+            ?>
+        </p>
     <?php
     }
 
@@ -263,7 +268,12 @@ class AdminOptions
         $taxonomy_slug = $options['taxonomy_slug'] ?? $this->config->taxonomy_slug_default;
     ?>
         <input type="text" id="taxonomy_slug" name="runthings_taxonomy_based_passwords_settings[taxonomy_slug]" value="<?php echo esc_attr($taxonomy_slug); ?>" />
-        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_slug_default) . "</code>"); ?></p>
+        <p class="description">
+            <?php
+            /* translators: %s is the default taxonomy slug */
+            printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_slug_default) . "</code>");
+            ?>
+        </p>
     <?php
     }
 
@@ -273,7 +283,12 @@ class AdminOptions
         $taxonomy_singular = $options['taxonomy_singular'] ?? $this->config->taxonomy_singular_default;
     ?>
         <input type="text" id="taxonomy_singular" name="runthings_taxonomy_based_passwords_settings[taxonomy_singular]" value="<?php echo esc_attr($taxonomy_singular); ?>" />
-        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_singular_default) . "</code>"); ?></p>
+        <p class="description">
+            <?php
+            /* translators: %s is the default taxonomy singular name */
+            printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_singular_default) . "</code>");
+            ?>
+        </p>
     <?php
     }
 
@@ -283,7 +298,12 @@ class AdminOptions
         $taxonomy_plural = $options['taxonomy_plural'] ?? $this->config->taxonomy_plural_default;
     ?>
         <input type="text" id="taxonomy_plural" name="runthings_taxonomy_based_passwords_settings[taxonomy_plural]" value="<?php echo esc_attr($taxonomy_plural); ?>" />
-        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_plural_default) . "</code>"); ?></p>
+        <p class="description">
+            <?php
+            /* translators: %s is the default taxonomy plural name */
+            printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), "<code>" . esc_html($this->config->taxonomy_plural_default) . "</code>");
+            ?>
+        </p>
     <?php
     }
 
