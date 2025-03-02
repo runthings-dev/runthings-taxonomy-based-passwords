@@ -99,7 +99,11 @@ class Runthings_Taxonomy_Based_Passwords
             'objects' => [],
             'exempt_roles' => ['administrator', 'editor', 'shop_manager'],
             'archive_redirect' => 'hub',
-            'delete_data_on_uninstall' => true, // Set the default value for the new setting
+            'taxonomy' => '',
+            'taxonomy_slug' => '',
+            'taxonomy_singular' => '',
+            'taxonomy_plural' => '',
+            'delete_data_on_uninstall' => true,
         ];
 
         if (!get_option('runthings_taxonomy_based_passwords_settings')) {
@@ -125,7 +129,7 @@ class Runthings_Taxonomy_Based_Passwords
             $role = get_role($role_name);
 
             if (!$role) {
-                continue; // Skip if the role doesn't exist
+                continue;
             }
 
             if (!$role->has_cap(Config::$manage_options_capability)) {

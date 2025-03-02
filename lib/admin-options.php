@@ -76,12 +76,51 @@ class AdminOptions
             'runthings_taxonomy_based_passwords_section'
         );
 
+        add_settings_section(
+            'runthings_taxonomy_based_passwords_advanced_section',
+            __('Advanced', 'runthings-taxonomy-based-passwords'),
+            null,
+            'runthings-taxonomy-based-passwords'
+        );
+
+        add_settings_field(
+            'taxonomy',
+            __('Taxonomy ID', 'runthings-taxonomy-based-passwords'),
+            [$this, 'render_taxonomy_field'],
+            'runthings-taxonomy-based-passwords',
+            'runthings_taxonomy_based_passwords_advanced_section'
+        );
+
+        add_settings_field(
+            'taxonomy_slug',
+            __('Taxonomy Slug', 'runthings-taxonomy-based-passwords'),
+            [$this, 'render_taxonomy_slug_field'],
+            'runthings-taxonomy-based-passwords',
+            'runthings_taxonomy_based_passwords_advanced_section'
+        );
+
+        add_settings_field(
+            'taxonomy_singular',
+            __('Taxonomy Singular Name', 'runthings-taxonomy-based-passwords'),
+            [$this, 'render_taxonomy_singular_field'],
+            'runthings-taxonomy-based-passwords',
+            'runthings_taxonomy_based_passwords_advanced_section'
+        );
+
+        add_settings_field(
+            'taxonomy_plural',
+            __('Taxonomy Plural Name', 'runthings-taxonomy-based-passwords'),
+            [$this, 'render_taxonomy_plural_field'],
+            'runthings-taxonomy-based-passwords',
+            'runthings_taxonomy_based_passwords_advanced_section'
+        );
+
         add_settings_field(
             'delete_data_on_uninstall',
             __('Delete All Data on Uninstall', 'runthings-taxonomy-based-passwords'),
             [$this, 'render_delete_data_on_uninstall_field'],
             'runthings-taxonomy-based-passwords',
-            'runthings_taxonomy_based_passwords_section'
+            'runthings_taxonomy_based_passwords_advanced_section'
         );
     }
 
@@ -92,7 +131,7 @@ class AdminOptions
             <h1><?php _e('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords'); ?></h1>
             <form method="post" action="options.php">
                 <?php
-                settings_fields('runthings_taxonomy_based_passwords');
+                settings_fields('runthings_taxonomy_based_passwords'); // Ensure this matches the option group name
                 do_settings_sections('runthings-taxonomy-based-passwords');
                 submit_button();
                 ?>
@@ -205,6 +244,46 @@ class AdminOptions
                 <?php _e('Redirect to Home Page', 'runthings-taxonomy-based-passwords'); ?>
             </label>
         </fieldset>
+    <?php
+    }
+
+    public function render_taxonomy_field(): void
+    {
+        $options = get_option('runthings_taxonomy_based_passwords_settings');
+        $taxonomy = $options['taxonomy'] ?? $this->config->taxonomy_default;
+    ?>
+        <input type="text" id="taxonomy" name="runthings_taxonomy_based_passwords_settings[taxonomy]" value="<?php echo esc_attr($taxonomy); ?>" />
+        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), esc_html($this->config->taxonomy_default)); ?></p>
+    <?php
+    }
+
+    public function render_taxonomy_slug_field(): void
+    {
+        $options = get_option('runthings_taxonomy_based_passwords_settings');
+        $taxonomy_slug = $options['taxonomy_slug'] ?? $this->config->taxonomy_slug_default;
+    ?>
+        <input type="text" id="taxonomy_slug" name="runthings_taxonomy_based_passwords_settings[taxonomy_slug]" value="<?php echo esc_attr($taxonomy_slug); ?>" />
+        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), esc_html($this->config->taxonomy_slug_default)); ?></p>
+    <?php
+    }
+
+    public function render_taxonomy_singular_field(): void
+    {
+        $options = get_option('runthings_taxonomy_based_passwords_settings');
+        $taxonomy_singular = $options['taxonomy_singular'] ?? $this->config->taxonomy_singular_default;
+    ?>
+        <input type="text" id="taxonomy_singular" name="runthings_taxonomy_based_passwords_settings[taxonomy_singular]" value="<?php echo esc_attr($taxonomy_singular); ?>" />
+        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), esc_html($this->config->taxonomy_singular_default)); ?></p>
+    <?php
+    }
+
+    public function render_taxonomy_plural_field(): void
+    {
+        $options = get_option('runthings_taxonomy_based_passwords_settings');
+        $taxonomy_plural = $options['taxonomy_plural'] ?? $this->config->taxonomy_plural_default;
+    ?>
+        <input type="text" id="taxonomy_plural" name="runthings_taxonomy_based_passwords_settings[taxonomy_plural]" value="<?php echo esc_attr($taxonomy_plural); ?>" />
+        <p class="description"><?php printf(__('Leave blank for default (%s)', 'runthings-taxonomy-based-passwords'), esc_html($this->config->taxonomy_plural_default)); ?></p>
     <?php
     }
 

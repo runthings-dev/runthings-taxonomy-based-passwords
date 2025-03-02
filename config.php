@@ -30,13 +30,15 @@ class Config
     /**
      * Taxonomy to use for password protection
      */
-    public string $taxonomy = 'grower_contract';
-    public string $taxonomy_slug = 'grower-contract';
-    public string $taxonomy_singular = 'Grower Contract';
-    public string $taxonomy_plural = 'Grower Contracts';
+    public string $taxonomy = '';
+    public string $taxonomy_slug = '';
+    public string $taxonomy_singular = '';
+    public string $taxonomy_plural = '';
 
-    // public string $taxonomy = 'password_group';
-    // public string $taxonomy_slug = 'password-group';
+    public string $taxonomy_default = 'access_group';
+    public string $taxonomy_slug_default = 'access-group';
+    public string $taxonomy_singular_default = 'Access Group';
+    public string $taxonomy_plural_default = 'Access Groups';
 
     /**
      * Archive redirect option (home page or hub page)
@@ -63,6 +65,10 @@ class Config
         $this->objects = $settings['objects'] ?? [];
         $this->exempt_roles = $settings['exempt_roles'] ?? [];
         $this->archive_redirect = $settings['archive_redirect'] ?? 'hub';
+        $this->taxonomy = $settings['taxonomy'] ?? $this->taxonomy_default;
+        $this->taxonomy_slug = $settings['taxonomy_slug'] ?? $this->taxonomy_slug_default;
+        $this->taxonomy_singular = $settings['taxonomy_singular'] ?? $this->taxonomy_singular_default;
+        $this->taxonomy_plural = $settings['taxonomy_plural'] ?? $this->taxonomy_plural_default;
         $this->delete_data_on_uninstall = (bool) ($settings['delete_data_on_uninstall'] ?? true);
     }
 }
