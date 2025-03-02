@@ -42,11 +42,11 @@ require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'config.php';
 
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'utils/cookies.php';
 
-require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/taxonomy.php';
-require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/protection.php';
-require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/authentication.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/admin-options.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/archive.php';
+require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/authentication.php';
+require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/protection.php';
+require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/taxonomy.php';
 
 class Runthings_Taxonomy_Based_Passwords
 {
@@ -57,11 +57,11 @@ class Runthings_Taxonomy_Based_Passwords
     {
         $this->config = new Config();
 
-        new Taxonomy($this->config);
-        new Protection($this->config);
-        new Authentication($this->config);
         new AdminOptions($this->config);
         new Archive($this->config);
+        new Authentication($this->config);
+        new Protection($this->config);
+        new Taxonomy($this->config);
 
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
         add_action('admin_notices', [$this, 'check_login_page_set']);
