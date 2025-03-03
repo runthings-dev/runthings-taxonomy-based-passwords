@@ -12,14 +12,10 @@ class Authentication
         $this->config = $config;
         $this->cookies = new Cookies();
 
-        // Add shortcodes
         add_shortcode('runthings_taxonomy_login_form', [$this, 'render_login_form']);
         add_shortcode('runthings_taxonomy_logout', [$this, 'render_logout_link']);
 
-        // Handle form submission
         add_action('init', [$this, 'handle_form_submission']);
-
-        // Handle logout
         add_action('init', [$this, 'handle_logout']);
     }
 
