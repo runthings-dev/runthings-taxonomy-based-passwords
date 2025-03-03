@@ -199,7 +199,7 @@ class Taxonomy
             <label for="term-password"><?php _e('Password', 'runthings-taxonomy-based-passwords'); ?></label>
             <input type="text" name="term_password" id="term-password" value="" />
             <p class="description"><?php _e('Enter a password to protect items tagged with this term.', 'runthings-taxonomy-based-passwords'); ?></p>
-            <?php wp_nonce_field('runthings_taxonomy_based_passwords_add_term', '_wpnonce'); ?>
+            <?php wp_nonce_field('add_term', 'runthings_tbp_add_term_nonce'); ?>
         </div>
     <?php
     }
@@ -215,7 +215,7 @@ class Taxonomy
             <td>
                 <input type="text" name="term_password" id="term-password" value="" placeholder="<?php _e('Enter new password', 'runthings-taxonomy-based-passwords'); ?>" />
                 <p class="description"><?php _e('Leave blank to keep the existing password.', 'runthings-taxonomy-based-passwords'); ?></p>
-                <?php wp_nonce_field('runthings_taxonomy_based_passwords_edit_term', '_wpnonce'); ?>
+                <?php wp_nonce_field('edit_term', 'runthings_tbp_edit_term_nonce'); ?>
             </td>
         </tr>
 <?php
@@ -226,7 +226,10 @@ class Taxonomy
      */
     public function save_password_field(int $term_id): void
     {
-        if (isset($_POST['_wpnonce']) && (wp_verify_nonce($_POST['_wpnonce'], 'runthings_taxonomy_based_passwords_add_term') || wp_verify_nonce($_POST['_wpnonce'], 'runthings_taxonomy_based_passwords_edit_term'))) {
+        if (
+            isset($_POST['runthings_tbp_add_term_nonce']) && wp_verify_nonce($_POST['runthings_tbp_add_term_nonce'], 'add_term') ||
+            isset($_POST['runthings_tbp_edit_term_nonce']) && wp_verify_nonce($_POST['runthings_tbp_edit_term_nonce'], 'edit_term')
+        ) {
             if (isset($_POST['term_password'])) {
                 $new_password = sanitize_text_field(trim($_POST['term_password']));
 
