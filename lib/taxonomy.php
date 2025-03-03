@@ -10,8 +10,10 @@ class Taxonomy
     {
         $this->config = $config;
 
+        $init_priority = 5; // To ensure taxonomy exists before form processing in \Authentication
+
         // Register taxonomy
-        add_action('init', [$this, 'register_access_group_taxonomy']);
+        add_action('init', [$this, 'register_access_group_taxonomy'], $init_priority);
         add_action('add_meta_boxes', [$this, 'add_access_group_meta_boxes']);
         add_action('save_post', [$this, 'save_access_group_meta_box']);
 
