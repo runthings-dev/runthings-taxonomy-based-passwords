@@ -12,9 +12,8 @@ class Protection
         $this->config = $config;
         $this->cookies = new Cookies();
 
-        // Add protection
-        add_action('template_redirect', [$this, 'single_protection']);
-        add_action('template_redirect', [$this, 'archive_protection']); // Add archive protection
+        add_action('wp', [$this, 'single_protection']);
+        add_action('wp', [$this, 'archive_protection']);
     }
 
     /**
@@ -22,7 +21,11 @@ class Protection
      */
     public function single_protection(): void
     {
-        if (!is_singular() || is_admin()) {
+        if ($this->is_bypassable_request()) {
+            return;
+        }
+
+        if (!is_singular()) {
             return;
         }
 
@@ -38,7 +41,11 @@ class Protection
      */
     public function archive_protection(): void
     {
-        if (!is_archive() || is_admin()) {
+        if ($this->is_bypassable_request()) {
+            return;
+        }
+
+        if (!is_archive()) {
             return;
         }
 
@@ -178,5 +185,26 @@ class Protection
         }
 
         return hash_equals($stored_hashed_password, $cookie_hashed_password);
+    }
+
+    private function is_bypassable_request(): bool
+    {
+        if (is_admin()) {
+            return true;
+        }
+
+        if (class_exists('\Elementor\Plugin')) {
+            if (\Elementor\Plugin::$instance->editor->is_edit_mode()) {
+                return true;
+            }
+
+            if (isset($_GET['elementor-preview']) && $_GET['elementor-preview']) {
+                return true;
+            }
+        }
+
+        $allow_bypass = defined('DOING_AJAX') && DOING_AJAX && is_user_logged_in();
+
+        return apply_filters('runthings_tbp_allow_admin_request_bypass', $allow_bypass);
     }
 }
