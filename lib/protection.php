@@ -74,6 +74,7 @@ class Protection
 
     private function check_for_authentication(): void
     {
+        // Handle exempt user roles
         if (!empty($this->config->exempt_roles) && is_user_logged_in()) {
             $user = wp_get_current_user();
             $user_roles = $user->roles;
@@ -85,12 +86,18 @@ class Protection
             }
         }
 
+        // Handle protected object with no assigned password term
+        $current_term_id = $this->get_current_term_id();
+        if (!$current_term_id) {
+            $this->redirect_to_home();
+        }
+
+        // Handle logged in users
         if ($this->cookies->is_logged_in()) {
             $cookie_value = $this->cookies->get_cookie_value();
             $term_id = $cookie_value['term_id'];
             $cookie_hashed_password = $cookie_value['password'];
 
-            $current_term_id = $this->get_current_term_id();
             if ($current_term_id !== $term_id) {
                 $this->redirect_to_login();
             }
@@ -112,6 +119,12 @@ class Protection
             return $terms[0]->term_id;
         }
         return null;
+    }
+
+    private function redirect_to_home(): void
+    {
+        wp_redirect(home_url());
+        exit;
     }
 
     private function redirect_to_login(): void
