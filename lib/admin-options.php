@@ -15,14 +15,25 @@ class AdminOptions
 
     public function add_settings_page(): void
     {
-        add_submenu_page(
-            'options-general.php', // Parent slug
-            __('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords'), // Page title
-            __('Taxonomy Passwords', 'runthings-taxonomy-based-passwords'), // Menu title
-            Config::$manage_options_capability, // Capability
-            'runthings-taxonomy-based-passwords', // Menu slug
-            [$this, 'render_settings_page'] // Callback function
-        );
+        if (current_user_can(Config::$manage_options_capability)) {
+            add_submenu_page(
+                'options-general.php', // Parent slug
+                __('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords'), // Page title
+                __('Taxonomy Passwords', 'runthings-taxonomy-based-passwords'), // Menu title
+                Config::$manage_options_capability, // Capability
+                'runthings-taxonomy-based-passwords', // Menu slug
+                [$this, 'render_settings_page'] // Callback function
+            );
+        } else {
+            add_menu_page(
+                __('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords'), // Page title
+                __('Taxonomy Passwords', 'runthings-taxonomy-based-passwords'), // Menu title
+                Config::$manage_options_capability, // Capability
+                'runthings-taxonomy-based-passwords', // Menu slug
+                [$this, 'render_settings_page'], // Callback function
+                'dashicons-lock' // Icon
+            );
+        }
     }
 
     public function register_settings(): void
