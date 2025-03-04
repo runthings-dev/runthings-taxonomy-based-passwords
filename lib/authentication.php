@@ -130,7 +130,7 @@ class Authentication
     {
         if ($this->cookies->is_logged_in()) {
             $logout_url = add_query_arg('runthings_taxonomy_logout', 'true', home_url());
-            return '<a href="' . esc_url($logout_url) . '">' . __('Log out', 'runthings-taxonomy-based-passwords') . '</a>';
+            return '<a href="' . esc_url($logout_url) . '">' . __('Log Out', 'runthings-taxonomy-based-passwords') . '</a>';
         }
 
         return '';
