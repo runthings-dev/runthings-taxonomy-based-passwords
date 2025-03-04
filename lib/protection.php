@@ -14,6 +14,16 @@ class Protection
 
         add_action('wp', [$this, 'single_protection']);
         add_action('wp', [$this, 'archive_protection']);
+
+        add_shortcode('runthings_taxonomy_current_term_id', [$this, 'render_current_term_id']);
+    }
+
+    /**
+     * Shortcode to render the current term ID for dynamic front end filtering
+     */
+    public function render_current_term_id()
+    {
+        return $this->get_current_term_id();
     }
 
     /**
