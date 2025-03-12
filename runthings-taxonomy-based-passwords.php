@@ -46,6 +46,7 @@ require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/admin-options.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/archive.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/authentication.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/cache.php';
+require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/hub.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/protection.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/taxonomy.php';
 
@@ -62,6 +63,7 @@ class Runthings_Taxonomy_Based_Passwords
         new Archive($this->config);
         new Authentication($this->config);
         new Cache($this->config);
+        new Hub($this->config);
         new Protection($this->config);
         new Taxonomy($this->config);
 
