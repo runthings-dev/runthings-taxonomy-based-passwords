@@ -16,6 +16,7 @@ class Protection
         add_action('wp', [$this, 'archive_protection']);
 
         add_shortcode('runthings_taxonomy_current_term_id', [$this, 'render_current_term_id']);
+        add_shortcode('runthings_taxonomy_current_user_access_group_name', [$this, 'render_current_user_access_group_name']);
     }
 
     /**
@@ -24,6 +25,30 @@ class Protection
     public function render_current_term_id()
     {
         return $this->get_current_term_id();
+    }
+
+    /**
+     * Shortcode to render the current user's access group name
+     */
+    public function render_current_user_access_group_name()
+    {
+        if (!$this->cookies->is_logged_in()) {
+            return '';
+        }
+
+        $cookie_value = $this->cookies->get_cookie_value();
+        if (!$cookie_value || !isset($cookie_value['term_id'])) {
+            return '';
+        }
+
+        $term_id = $cookie_value['term_id'];
+        $term = get_term($term_id, $this->config->taxonomy);
+
+        if (!$term || is_wp_error($term)) {
+            return '';
+        }
+
+        return $term->name;
     }
 
     /**
