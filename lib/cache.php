@@ -74,6 +74,10 @@ class Cache
     {
         $post_type = get_post_type();
 
+        if (!$post_type) {
+            return false;
+        }
+
         return (is_singular() && ($this->is_protected_object($post_type) || $this->is_child_of_hub_object($post_type)))
             || (is_archive() && $this->is_protected_object($post_type));
     }

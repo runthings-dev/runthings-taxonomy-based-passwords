@@ -35,6 +35,7 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
+define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_VERSION', '0.5.0');
 define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL', plugin_dir_url(__FILE__));
 define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR', plugin_dir_path(__FILE__));
 
@@ -81,7 +82,7 @@ class Runthings_Taxonomy_Based_Passwords
 
     public function add_settings_link(array $links): array
     {
-        $settings_link = '<a href="options-general.php?page=runthings-taxonomy-based-passwords">' . __('Settings') . '</a>';
+        $settings_link = '<a href="' . esc_url(admin_url('options-general.php?page=runthings-taxonomy-based-passwords')) . '">' . esc_html__('Settings', 'runthings-taxonomy-based-passwords') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
@@ -89,9 +90,11 @@ class Runthings_Taxonomy_Based_Passwords
     public function check_login_page_set(): void
     {
         if ($this->config->login_page_id === 0) {
-            echo '<div class="notice notice-warning is-dismissible">';
-            echo '<p><strong>' . __('Taxonomy-Based Passwords', 'runthings-taxonomy-based-passwords') . ':</strong> ' . __('The login page is not set. Content will not be protected until the login page is set up.', 'runthings-taxonomy-based-passwords') . '</p>';
-            echo '</div>';
+            printf(
+                '<div class="notice notice-warning is-dismissible"><p><strong>%s</strong> %s</p></div>',
+                esc_html__('Taxonomy-Based Passwords:', 'runthings-taxonomy-based-passwords'),
+                esc_html__('The login page is not set. Content will not be protected until the login page is set up.', 'runthings-taxonomy-based-passwords')
+            );
         }
     }
 

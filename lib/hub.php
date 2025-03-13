@@ -41,11 +41,13 @@ class Hub
             $html = '<ul class="runthings-taxonomy-based-passwords-hub-page-list">';
             while ($query->have_posts()) {
                 $query->the_post();
-                $html .= '<li><a href="' . get_permalink() . '">' . get_the_title() . '</a></li>';
+                $html .= '<li><a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a></li>';
             }
             $html .= '</ul>';
+            wp_reset_postdata();
+            return $html;
         }
 
-        return $html;
+        return '';
     }
 }

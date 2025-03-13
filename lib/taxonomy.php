@@ -38,8 +38,8 @@ class Taxonomy
     public function register_access_group_taxonomy(): void
     {
         $labels = [
-            'name'              => _x($this->config->taxonomy_plural, 'taxonomy general name', 'runthings-taxonomy-based-passwords'),
-            'singular_name'     => _x($this->config->taxonomy_singular, 'taxonomy singular name', 'runthings-taxonomy-based-passwords'),
+            'name'              => esc_html($this->config->taxonomy_plural),
+            'singular_name'     => esc_html($this->config->taxonomy_singular),
             'search_items'      => sprintf(
                 /* translators: %s is the plural name of the taxonomy */
                 __('Search %s', 'runthings-taxonomy-based-passwords'),
@@ -80,7 +80,7 @@ class Taxonomy
                 __('New %s Name', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
             ),
-            'menu_name'         => _x($this->config->taxonomy_plural, 'admin menu', 'runthings-taxonomy-based-passwords'),
+            'menu_name'         => esc_html($this->config->taxonomy_plural),
         ];
 
         $args = [
@@ -147,13 +147,25 @@ class Taxonomy
         $selected_term = wp_get_post_terms($post->ID, $this->config->taxonomy, ['fields' => 'ids']);
         $selected_term = !empty($selected_term) ? $selected_term[0] : '';
 
+        wp_nonce_field('save_access_group_term', 'runthings_tbp_access_group_term_nonce');
+
         echo '<select name="access_group_term" id="access_group_term">';
-        echo '<option value="">' . sprintf(
-            __('Select %s', 'runthings-taxonomy-based-passwords') /* translators: %s is the singular name of the taxonomy */,
-            esc_html($this->config->taxonomy_singular)
-        ) . '</option>';
+        printf(
+            '<option value="">%s</option>',
+            sprintf(
+                /* translators: %s is the singular name of the taxonomy */
+                esc_html__('Select %s', 'runthings-taxonomy-based-passwords'),
+                esc_html($this->config->taxonomy_singular)
+            )
+        );
+
         foreach ($terms as $term) {
-            echo '<option value="' . esc_attr($term->term_id) . '" ' . selected($selected_term, $term->term_id, false) . '>' . esc_html($term->name) . '</option>';
+            printf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr($term->term_id),
+                selected($selected_term, $term->term_id, false),
+                esc_html($term->name)
+            );
         }
         echo '</select>';
     }
@@ -167,13 +179,17 @@ class Taxonomy
             return;
         }
 
+        if (!isset($_POST['runthings_tbp_access_group_term_nonce']) || !wp_verify_nonce(sanitize_key(wp_unslash($_POST['runthings_tbp_access_group_term_nonce'])), 'save_access_group_term')) {
+            return;
+        }
+
         $post = get_post($post_id);
         if ($post->post_type === $this->config->hub_object && !$this->is_child_of_hub_object($post)) {
             return;
         }
 
         if (isset($_POST['access_group_term'])) {
-            $term_id = intval($_POST['access_group_term']);
+            $term_id = intval(wp_unslash($_POST['access_group_term']));
             if ($term_id) {
                 wp_set_post_terms($post_id, [$term_id], $this->config->taxonomy);
             } else {
@@ -198,10 +214,10 @@ class Taxonomy
     {
 ?>
         <div class="form-field term-password-wrap">
-            <label for="term-password"><?php _e('Password', 'runthings-taxonomy-based-passwords'); ?></label>
+            <label for="term-password"><?php esc_html_e('Password', 'runthings-taxonomy-based-passwords'); ?></label>
             <input type="text" name="term_password" id="term-password" value="" />
-            <p class="description"><?php _e('Enter a password to protect items tagged with this term.', 'runthings-taxonomy-based-passwords'); ?></p>
-            <?php wp_nonce_field('add_term', 'runthings_tbp_add_term_nonce'); ?>
+            <p class="description"><?php esc_html_e('Enter a password to protect items tagged with this term.', 'runthings-taxonomy-based-passwords'); ?></p>
+            <?php wp_nonce_field('add_password_term', 'runthings_tbp_add_password_term_nonce'); ?>
         </div>
     <?php
     }
@@ -213,11 +229,11 @@ class Taxonomy
     {
     ?>
         <tr class="form-field term-password-wrap">
-            <th scope="row"><label for="term-password"><?php _e('Password', 'runthings-taxonomy-based-passwords'); ?></label></th>
+            <th scope="row"><label for="term-password"><?php esc_html_e('Password', 'runthings-taxonomy-based-passwords'); ?></label></th>
             <td>
-                <input type="text" name="term_password" id="term-password" value="" placeholder="<?php _e('Enter new password', 'runthings-taxonomy-based-passwords'); ?>" />
-                <p class="description"><?php _e('Leave blank to keep the existing password.', 'runthings-taxonomy-based-passwords'); ?></p>
-                <?php wp_nonce_field('edit_term', 'runthings_tbp_edit_term_nonce'); ?>
+                <input type="text" name="term_password" id="term-password" value="" placeholder="<?php esc_html_e('Enter new password', 'runthings-taxonomy-based-passwords'); ?>" />
+                <p class="description"><?php esc_html_e('Leave blank to keep the existing password.', 'runthings-taxonomy-based-passwords'); ?></p>
+                <?php wp_nonce_field('edit_password_term', 'runthings_tbp_edit_password_term_nonce'); ?>
             </td>
         </tr>
 <?php
@@ -229,11 +245,19 @@ class Taxonomy
     public function save_password_field(int $term_id): void
     {
         if (
-            isset($_POST['runthings_tbp_add_term_nonce']) && wp_verify_nonce($_POST['runthings_tbp_add_term_nonce'], 'add_term') ||
-            isset($_POST['runthings_tbp_edit_term_nonce']) && wp_verify_nonce($_POST['runthings_tbp_edit_term_nonce'], 'edit_term')
+            isset($_POST['runthings_tbp_add_password_term_nonce']) &&
+            wp_verify_nonce(
+                sanitize_key(wp_unslash($_POST['runthings_tbp_add_password_term_nonce'])),
+                'add_password_term'
+            ) ||
+            isset($_POST['runthings_tbp_edit_password_term_nonce']) &&
+            wp_verify_nonce(
+                sanitize_key(wp_unslash($_POST['runthings_tbp_edit_password_term_nonce'])),
+                'edit_password_term'
+            )
         ) {
             if (isset($_POST['term_password'])) {
-                $new_password = sanitize_text_field(trim($_POST['term_password']));
+                $new_password = sanitize_text_field(wp_unslash($_POST['term_password']));
 
                 // Get existing hashed password
                 $existing_hashed_password = get_term_meta($term_id, 'runthings_taxonomy_password', true);
@@ -253,7 +277,7 @@ class Taxonomy
     public function edit_taxonomy_column_title(array $columns): array
     {
         if (isset($columns["taxonomy-{$this->config->taxonomy}"])) {
-            $columns["taxonomy-{$this->config->taxonomy}"] = $this->config->taxonomy_singular;
+            $columns["taxonomy-{$this->config->taxonomy}"] = esc_html($this->config->taxonomy_singular);
         }
         return $columns;
     }

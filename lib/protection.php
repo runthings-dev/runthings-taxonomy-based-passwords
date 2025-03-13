@@ -90,9 +90,9 @@ class Protection
             // must redirect to home or hub, there is no individual term attached to
             // an archive page to check against
             if ($this->config->archive_redirect === 'hub' && $this->config->hub_object_id && get_post_status($this->config->hub_object_id) === 'publish') {
-                wp_redirect(get_permalink($this->config->hub_object_id));
+                wp_safe_redirect(get_permalink($this->config->hub_object_id));
             } else {
-                wp_redirect(home_url());
+                wp_safe_redirect(home_url());
             }
             exit;
         }
@@ -165,7 +165,7 @@ class Protection
 
     private function redirect_to_home(): void
     {
-        wp_redirect(home_url());
+        wp_safe_redirect(home_url());
         exit;
     }
 
@@ -192,7 +192,9 @@ class Protection
             $login_url
         );
 
-        wp_redirect($login_url);
+        $login_url = wp_nonce_url($login_url, 'runthings_taxonomy_based_passwords_login_form');
+
+        wp_safe_redirect($login_url);
         exit;
     }
 
@@ -233,7 +235,9 @@ class Protection
                 return true;
             }
 
-            if (isset($_GET['elementor-preview']) && $_GET['elementor-preview']) {
+            // reason - not processing data, and its not our form to inject the nonce into
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            if (!empty($_GET['elementor-preview']) && absint(wp_unslash($_GET['elementor-preview']))) {
                 return true;
             }
         }

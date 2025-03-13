@@ -29,6 +29,7 @@ class Cookies
         setcookie($this->cookie_name, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
     }
 
+
     /**
      * Check if the user is logged in
      */
@@ -42,10 +43,6 @@ class Cookies
      */
     public function get_cookie_value(): ?array
     {
-        if ($this->is_logged_in()) {
-            return json_decode(stripslashes($_COOKIE[$this->cookie_name]), true);
-        }
-
-        return null;
+        return isset($_COOKIE[$this->cookie_name]) ? json_decode(sanitize_text_field(wp_unslash($_COOKIE[$this->cookie_name])), true) : null;
     }
 }

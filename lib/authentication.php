@@ -28,7 +28,7 @@ class Authentication
             return;
         }
 
-        if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'runthings_taxonomy_based_passwords_login_form')) {
+        if (!isset($_POST['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash(($_POST['_wpnonce']))), 'runthings_taxonomy_based_passwords_login_form')) {
             return;
         }
 
@@ -36,8 +36,8 @@ class Authentication
             return;
         }
 
-        $input_password = sanitize_text_field($_POST['post_password']);
-        $return_url = esc_url_raw($_POST['return_url']);
+        $input_password = sanitize_text_field(wp_unslash($_POST['post_password']));
+        $return_url = esc_url_raw(wp_unslash($_POST['return_url']));
         $original_post_id = intval($_POST['original_post_id']);
 
         if (!$original_post_id || trim($return_url) === '') {
@@ -55,14 +55,19 @@ class Authentication
         }
 
         // Password is incorrect, add error query parameter
-        $login_url = add_query_arg([
-            'error' => 'incorrect_password',
-            'return_url' => urlencode($return_url),
-            'original_post_id' => $original_post_id
-            // Caution: login_page_id may be 0. Currently the form only submits from the login page
-            // so this should not be an issue, but if its used elsewhere, it may need to be updated
-        ], get_permalink($this->config->login_page_id));
-        wp_safe_redirect($login_url);
+        $destination_url = home_url();
+        if ($this->config->login_page_id !== 0) {
+            $destination_url = get_permalink($this->config->login_page_id);
+            $destination_url = add_query_arg([
+                'error' => 'incorrect_password',
+                'return_url' => urlencode($return_url),
+                'original_post_id' => $original_post_id
+            ], $destination_url);
+
+            $destination_url = wp_nonce_url($destination_url, 'runthings_taxonomy_based_passwords_login_form');
+        }
+
+        wp_safe_redirect($destination_url);
         exit;
     }
 
@@ -72,6 +77,11 @@ class Authentication
     public function handle_logout(): void
     {
         if (isset($_GET['runthings_taxonomy_logout'])) {
+            if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'runthings_taxonomy_based_passwords_logout')) {
+                wp_safe_redirect(home_url('?logout_error=invalid_nonce'));
+                exit;
+            }
+
             $this->cookies->clear_cookie();
             wp_safe_redirect(home_url());
             exit;
@@ -83,44 +93,53 @@ class Authentication
      */
     public function render_login_form(array $atts): string
     {
-        wp_enqueue_style('runthings-taxonomy-based-passwords-styles', RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL . 'assets/css/styles.css');
+        wp_enqueue_style('runthings-taxonomy-based-passwords-styles', RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL . 'assets/css/styles.css', [], RUNTHINGS_TAXONOMY_BASED_PASSWORDS_VERSION);
 
-        $field_id = 'pwbox-' . rand();
-        $invalid_password = __('The password you entered is incorrect.', 'runthings-taxonomy-based-passwords');
+        $field_id = 'pwbox-' . wp_rand();
+        $invalid_password = esc_html__('The password you entered is incorrect.', 'runthings-taxonomy-based-passwords');
         $invalid_password_html = '';
         $aria = '';
         $class = '';
 
-        // Set Up error message if present
-        if (isset($_REQUEST['error']) && $_REQUEST['error'] === 'incorrect_password') {
-            $invalid_password_html = '<div class="runthings-taxonomy-based-passwords-error" role="alert"><p id="error-' . $field_id . '">' . $invalid_password . '</p></div>';
-            $class = ' password-form-error';
-            $aria = ' aria-describedby="error-' . $field_id . '"';
+        // If any values posted, check the nonce before parsing
+        if (isset($_REQUEST['error']) || isset($_GET['return_url']) || isset($_GET['original_post_id'])) {
+            if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'runthings_taxonomy_based_passwords_login_form')) {
+                $invalid_password_html = '<div class="runthings-taxonomy-based-passwords-error" role="alert"><p id="error-' . esc_attr($field_id) . '">' . esc_html__('Session expired. Please go back and try again.', 'runthings-taxonomy-based-passwords') . '</p></div>';
+
+                return $invalid_password_html;
+            }
         }
 
-        $form = '<form method="post" class="post-password-form runthings-taxonomy-based-passwords-login-form' . $class . '"> ';
-        $form .= '<p>' . __('This content is restricted. Please enter your password to view it.', 'runthings-taxonomy-based-passwords') . '</p>';
-        $form .= $invalid_password_html;
-        $form .= '<p><label for="' . $field_id . '">' . __('Password:', 'runthings-taxonomy-based-passwords') . ' <input name="post_password" id="' . $field_id . '" type="password" spellcheck="false" required  size="20" ' . $aria . ' /></label>';
-        $form .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter', 'runthings-taxonomy-based-passwords') . '" /></p>';
+        // // Set up incorrect password error message if present
+        if (isset($_REQUEST['error']) && sanitize_text_field(wp_unslash($_REQUEST['error'])) === 'incorrect_password') {
+            $invalid_password_html = '<div class="runthings-taxonomy-based-passwords-error" role="alert"><p id="error-' . esc_attr($field_id) . '">' . $invalid_password . '</p></div>';
+            $class = ' password-form-error';
+            $aria = ' aria-describedby="error-' . esc_attr($field_id) . '"';
+        }
+
+        $output = '<form method="post" class="post-password-form runthings-taxonomy-based-passwords-login-form' . esc_attr($class) . '"> ';
+        $output .= '<p>' . esc_html__('This content is restricted. Please enter your password to view it.', 'runthings-taxonomy-based-passwords') . '</p>';
+        $output .= $invalid_password_html;
+        $output .= '<p><label for="' . esc_attr($field_id) . '">' . esc_html__('Password:', 'runthings-taxonomy-based-passwords') . ' <input name="post_password" id="' . esc_attr($field_id) . '" type="password" spellcheck="false" required size="20"' . $aria . ' /></label>';
+        $output .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter', 'runthings-taxonomy-based-passwords') . '" /></p>';
 
         // Add hidden fields for return URL and form type
         if (isset($_GET['return_url'])) {
-            $return_url = esc_url($_GET['return_url']);
-            $form .= '<input type="hidden" name="return_url" value="' . $return_url . '">';
+            $return_url = esc_url(sanitize_text_field(wp_unslash($_GET['return_url'])));
+            $output .= '<input type="hidden" name="return_url" value="' . esc_attr($return_url) . '">';
         }
 
         if (isset($_GET['original_post_id'])) {
-            $post_id = intval($_GET['original_post_id']);
-            $form .= '<input type="hidden" name="original_post_id" value="' . $post_id . '">';
+            $post_id = intval(wp_unslash($_GET['original_post_id']));
+            $output .= '<input type="hidden" name="original_post_id" value="' . esc_attr($post_id) . '">';
         }
 
-        $form .= '<input type="hidden" name="runthings_taxonomy_based_password_form" value="login_form">';
-        $form .= wp_nonce_field('runthings_taxonomy_based_passwords_login_form', '_wpnonce', true, false);
+        $output .= '<input type="hidden" name="runthings_taxonomy_based_password_form" value="login_form">';
+        $output .= wp_nonce_field('runthings_taxonomy_based_passwords_login_form', '_wpnonce', true, false);
 
-        $form .= '</form>';
+        $output .= '</form>';
 
-        return $form;
+        return $output;
     }
 
     /**
@@ -130,6 +149,7 @@ class Authentication
     {
         if ($this->cookies->is_logged_in()) {
             $logout_url = add_query_arg('runthings_taxonomy_logout', 'true', home_url());
+            $logout_url = wp_nonce_url($logout_url, 'runthings_taxonomy_based_passwords_logout');
             return '<a href="' . esc_url($logout_url) . '">' . __('Log Out', 'runthings-taxonomy-based-passwords') . '</a>';
         }
 
