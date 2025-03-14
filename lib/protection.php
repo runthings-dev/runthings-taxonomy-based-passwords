@@ -238,7 +238,9 @@ class Protection
             // reason - not processing data, and its not our form to inject the nonce into
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             if (!empty($_GET['elementor-preview']) && absint(wp_unslash($_GET['elementor-preview']))) {
-                return true;
+                $required_cap = apply_filters('runthings_tbp_required_bypass_elementor_cap', 'edit_posts');
+
+                return current_user_can($required_cap);
             }
         }
 
