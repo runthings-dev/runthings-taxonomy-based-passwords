@@ -238,6 +238,12 @@ class AdminOptions
             }
             ?>
         </select>
+        <p class="description">
+            <?php
+            /* translators: %s is the hub page shortcode */
+            printf(esc_html__('Optionally, add the shortcode to this page: %s', 'runthings-taxonomy-based-passwords'), "<code>[" . $this->config->shortcode_hub_page_list . "]</code>");
+            ?>
+        </p>
     <?php
     }
 
@@ -254,6 +260,12 @@ class AdminOptions
             }
             ?>
         </select>
+        <p class="description">
+            <?php
+            /* translators: %s is the login page shortcode */
+            printf(esc_html__('Add the shortcode to this page: %s', 'runthings-taxonomy-based-passwords'), "<code>[" . $this->config->shortcode_login_form . "]</code>");
+            ?>
+        </p>
     <?php
     }
 
