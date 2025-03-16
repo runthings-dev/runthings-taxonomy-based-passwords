@@ -15,8 +15,8 @@ class Protection
         add_action('wp', [$this, 'single_protection']);
         add_action('wp', [$this, 'archive_protection']);
 
-        add_shortcode('runthings_taxonomy_current_term_id', [$this, 'render_current_term_id']);
-        add_shortcode('runthings_taxonomy_current_user_access_group_name', [$this, 'render_current_user_access_group_name']);
+        add_shortcode($this->config->shortcode_current_term_id, [$this, 'render_current_term_id']);
+        add_shortcode($this->config->shortcode_current_user_access_group_name, [$this, 'render_current_user_access_group_name']);
     }
 
     /**

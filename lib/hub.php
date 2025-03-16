@@ -10,7 +10,7 @@ class Hub
     {
         $this->config = $config;
 
-        add_shortcode('runthings_taxonomy_hub_page_list', [$this, 'render_hub_page_list']);
+        add_shortcode($this->config->shortcode_hub_page_list, [$this, 'render_hub_page_list']);
     }
 
     /**

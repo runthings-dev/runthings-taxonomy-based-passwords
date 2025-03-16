@@ -12,8 +12,8 @@ class Authentication
         $this->config = $config;
         $this->cookies = new Cookies();
 
-        add_shortcode('runthings_taxonomy_login_form', [$this, 'render_login_form']);
-        add_shortcode('runthings_taxonomy_logout', [$this, 'render_logout_link']);
+        add_shortcode($this->config->shortcode_login_form, [$this, 'render_login_form']);
+        add_shortcode($this->config->shortcode_logout, [$this, 'render_logout_link']);
 
         add_action('init', [$this, 'handle_form_submission']);
         add_action('init', [$this, 'handle_logout']);

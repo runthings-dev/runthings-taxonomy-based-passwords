@@ -51,6 +51,15 @@ class Config
     public bool $delete_data_on_uninstall;
 
     /**
+     * Shortcodes
+     */
+    public string $shortcode_login_form = 'runthings_taxonomy_login_form';
+    public string $shortcode_logout = 'runthings_taxonomy_logout';
+    public string $shortcode_hub_page_list = 'runthings_taxonomy_hub_page_list';
+    public string $shortcode_current_term_id = 'runthings_taxonomy_current_term_id';
+    public string $shortcode_current_user_access_group_name = 'runthings_taxonomy_current_user_access_group_name';
+
+    /**
      * Capabilities (static for the plugin 'activate' hook to be able to scaffold them)
      */
     public static string $manage_options_capability = 'runthings_tbp_manage_options';
