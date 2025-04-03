@@ -34,13 +34,64 @@ class Authentication
         add_shortcode($this->config->shortcode_login_form, [$this, 'login_form_shortcode']);
         add_shortcode($this->config->shortcode_logout, [$this, 'logout_link_shortcode']);
 
-        // Only handle logout, not form submissions - we'll do that in the shortcode
+        add_action('init', [$this, 'handle_login_validate_password']);
         add_action('init', [$this, 'handle_logout']);
     }
 
     /**
+     * Process password submissions during init to allow for proper redirects.
+     * Only handles the successful password validation to set cookie and redirect.
+     * And lets the shortcode rendering detect any errors and display them.
+     *
+     * @return void
+     */
+    public function handle_login_validate_password(): void
+    {
+        // Only process POST requests from our form
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['runthings_taxonomy_based_password_form'])) {
+            return;
+        }
+
+        // Basic validation
+        if (!isset($_POST['post_password'], $_POST['return_url'], $_POST['original_post_id'], $_POST['_wpnonce'])) {
+            return;
+        }
+
+        // Nonce verification
+        if (!$this->verify_nonce($_POST, '_wpnonce', 'runthings_taxonomy_based_passwords_form')) {
+            return;
+        }
+
+        // Sanitize inputs
+        $input_password = sanitize_text_field(wp_unslash($_POST['post_password']));
+        $return_url = esc_url_raw(wp_unslash($_POST['return_url']));
+        $original_post_id = (int)$_POST['original_post_id'];
+
+        // Basic data validation
+        if (empty($input_password) || empty($return_url) || empty($original_post_id)) {
+            return;
+        }        
+
+        // Validate URL domain
+        if ($this->validate_url_domain($return_url)) {
+            return;
+        }
+
+        // Password verification
+        $term_id = $this->get_term_id($original_post_id);
+        $stored_hashed_password = $this->get_valid_password($term_id);
+
+        if ($this->verify_password($input_password, $stored_hashed_password)) {
+            $this->cookies->set_cookie($stored_hashed_password, $term_id);
+            wp_safe_redirect($return_url);
+            exit;
+        }
+        
+        // If password invalid, just return and let the form submission flow handle it
+    }
+
+    /**
      * Renders the login form shortcode.
-     * Also handles form processing when submitted via POST.
      *
      * @param array $atts Shortcode attributes.
      * @return string The login form HTML.
@@ -60,7 +111,6 @@ class Authentication
 
     /**
      * Collects and validates data from the login form.
-     * Refactored to reduce complexity and remove duplicated code.
      *
      * @return array An array containing the form data and error messages.
      */
@@ -90,6 +140,8 @@ class Authentication
 
     /**
      * Process POST submission for password verification.
+     * The `handle_login_validate_password` checks for the successful password validation.
+     * This method handles the form submission and sets up the error messages.
      *
      * @param array $data The initial data array.
      * @return array Updated data array.
@@ -125,17 +177,16 @@ class Authentication
             return $data;
         }
 
-        // Verify password
+        // Verify password (should always be wrong at this point)
         $term_id = $this->get_term_id($data['original_post_id']);
         $stored_hashed_password = $this->get_valid_password($term_id);
 
-        if ($this->verify_password($input_password, $stored_hashed_password)) {
-            $this->cookies->set_cookie($stored_hashed_password, $term_id);
-            wp_safe_redirect($data['return_url']);
-            exit;
+        if (!$this->verify_password($input_password, $stored_hashed_password)) {
+            $data['error_message'] = __('The password you entered is incorrect.', 'runthings-taxonomy-based-passwords');
+            return $data;
         } 
         
-        $data['error_message'] = __('The password you entered is incorrect.', 'runthings-taxonomy-based-passwords');
+        $data['error_message'] = __('An unknown error has occurred.', 'runthings-taxonomy-based-passwords');
         return $data;
     }
 
@@ -197,6 +248,12 @@ class Authentication
         return null;
     }
 
+    /**
+     * Renders the login form HTML.
+     *
+     * @param array $data Form data including error messages and field IDs.
+     * @return string The login form HTML.
+     */
     private function render_login_form(array $data): string
     {
         $aria = '';
