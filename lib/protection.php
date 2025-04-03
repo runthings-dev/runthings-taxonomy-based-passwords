@@ -181,18 +181,19 @@ class Protection
             return;
         }
 
+        // Add nonce before query params to prevent &amp; in URL
+        $login_url = wp_nonce_url($login_url, 'runthings_taxonomy_based_passwords_login_redirect');
+
         // Add the current URL as a return URL parameter
         global $wp;
         $current_url = home_url(add_query_arg([], $wp->request));
         $login_url = add_query_arg(
             [
-                'return_url' => urlencode($current_url),
+                'return_url' => rawurlencode($current_url),
                 'original_post_id' => get_the_ID()
             ],
             $login_url
         );
-
-        $login_url = wp_nonce_url($login_url, 'runthings_taxonomy_based_passwords_login_form');
 
         wp_safe_redirect($login_url);
         exit;
