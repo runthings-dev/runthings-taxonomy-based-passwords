@@ -54,130 +54,181 @@ class Authentication
             RUNTHINGS_TAXONOMY_BASED_PASSWORDS_VERSION
         );
 
-        // State variables
-        $error_message = '';
-        $return_url = '';
-        $original_post_id = 0;
-        $input_password = '';
+        $data = $this->collect_login_form_data();
+        return $this->render_login_form($data);
+    }
 
-        // Generate a unique field ID for accessibility
-        $field_id = 'pwbox-' . wp_rand();
+    /**
+     * Collects and validates data from the login form.
+     * Refactored to reduce complexity and remove duplicated code.
+     *
+     * @return array An array containing the form data and error messages.
+     */
+    private function collect_login_form_data(): array
+    {
+        $data = [
+            'error_message' => '',
+            'return_url' => '',
+            'original_post_id' => 0,
+            'field_id' => 'pwbox-' . wp_rand(),
+        ];
 
-        // Process form submission (POST request)
+        // Handle POST submission (login attempt)
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['runthings_taxonomy_based_password_form'])) {
-            // Verify nonce
-            if (
-                ! isset($_POST['_wpnonce']) ||
-                ! wp_verify_nonce(sanitize_key(wp_unslash($_POST['_wpnonce'])), 'runthings_taxonomy_based_passwords_form')
-            ) {
-                $error_message = __('POST: Security verification failed. Please try again.', 'runthings-taxonomy-based-passwords');
-            } else {
-                // Validate required fields
-                if (! isset($_POST['post_password']) || ! isset($_POST['return_url']) || ! isset($_POST['original_post_id'])) {
-                    $error_message = __('Missing required fields.', 'runthings-taxonomy-based-passwords');
-                } else {
-                    // Sanitize and set form values
-                    $input_password = sanitize_text_field(wp_unslash($_POST['post_password']));
-                    $return_url = esc_url_raw(wp_unslash($_POST['return_url']));
-                    $original_post_id = (int) $_POST['original_post_id'];
+            return $this->process_post_submission($data);
+        }
+        
+        // Handle GET request (initial form load)
+        if (isset($_REQUEST['return_url'], $_REQUEST['original_post_id'])) {
+            return $this->process_get_request($data);
+        }
+        
+        // No parameters provided
+        $data['error_message'] = __('Missing required parameters. Please try accessing the protected content again.', 'runthings-taxonomy-based-passwords');
+        return $data;
+    }
 
-                    // Validate data
-                    if (empty($original_post_id) || empty($return_url)) {
-                        $error_message = __('Invalid form data.', 'runthings-taxonomy-based-passwords');
-                    } else {
-                        // Validate URL domain (security measure)
-                        $return_url_host = wp_parse_url($return_url, PHP_URL_HOST);
-                        $site_host = wp_parse_url(home_url(), PHP_URL_HOST);
-
-                        if ($return_url_host !== $site_host) {
-                            $error_message = __('Invalid return URL.', 'runthings-taxonomy-based-passwords');
-                        } else {
-                            // Process authentication
-                            $term_id = $this->get_term_id($original_post_id);
-                            $stored_hashed_password = $this->get_valid_password($term_id);
-
-                            if ($this->verify_password($input_password, $stored_hashed_password)) {
-                                // Success - set cookie and redirect
-                                $this->cookies->set_cookie($stored_hashed_password, $term_id);
-                                wp_safe_redirect($return_url);
-                                exit;
-                            } else {
-                                // Invalid password
-                                $error_message = __('The password you entered is incorrect.', 'runthings-taxonomy-based-passwords');
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            // Initial form load via redirect (GET request)
-            if (isset($_REQUEST['return_url']) && isset($_REQUEST['original_post_id'])) {
-                // Verify nonce
-                if (
-                    ! isset($_GET['_wpnonce']) ||
-                    ! wp_verify_nonce(sanitize_key(wp_unslash($_GET['_wpnonce'])), 'runthings_taxonomy_based_passwords_login_redirect')
-                ) {
-                    return '<div class="runthings-taxonomy-based-passwords-error" role="alert">' .
-                        esc_html__('GET: Security verification failed. Please try accessing the protected content again.', 'runthings-taxonomy-based-passwords') .
-                        '</div>';
-                }
-
-                $return_url = esc_url_raw(wp_unslash($_GET['return_url']));
-                $original_post_id = (int) $_GET['original_post_id'];
-
-                // Validate URL domain (security measure)
-                $return_url_host = wp_parse_url($return_url, PHP_URL_HOST);
-                $site_host = wp_parse_url(home_url(), PHP_URL_HOST);
-
-                if ($return_url_host !== $site_host) {
-                    return '<div class="runthings-taxonomy-based-passwords-error" role="alert">' .
-                        esc_html__('Invalid return URL.', 'runthings-taxonomy-based-passwords') .
-                        '</div>';
-                }
-            } else {
-                // No parameters provided
-                return '<div class="runthings-taxonomy-based-passwords-error" role="alert">' .
-                    esc_html__('Missing required parameters. Please try accessing the protected content again.', 'runthings-taxonomy-based-passwords') .
-                    '</div>';
-            }
+    /**
+     * Process POST submission for password verification.
+     *
+     * @param array $data The initial data array.
+     * @return array Updated data array.
+     */
+    private function process_post_submission(array $data): array
+    {
+        // Verify security nonce
+        if (!$this->verify_nonce($_POST, '_wpnonce', 'runthings_taxonomy_based_passwords_form')) {
+            $data['error_message'] = __('Security verification failed. Please try again.', 'runthings-taxonomy-based-passwords');
+            return $data;
         }
 
-        // Set up accessibility attributes if there's an error
+        // Check required fields
+        if (!isset($_POST['post_password'], $_POST['return_url'], $_POST['original_post_id'])) {
+            $data['error_message'] = __('Missing required fields.', 'runthings-taxonomy-based-passwords');
+            return $data;
+        }
+
+        // Sanitize input
+        $input_password = sanitize_text_field(wp_unslash($_POST['post_password']));
+        $data['return_url'] = esc_url_raw(wp_unslash($_POST['return_url']));
+        $data['original_post_id'] = (int)$_POST['original_post_id'];
+
+        // Validate data
+        if (empty($data['original_post_id']) || empty($data['return_url'])) {
+            $data['error_message'] = __('Invalid form data.', 'runthings-taxonomy-based-passwords');
+            return $data;
+        }
+
+        // Validate URL domain
+        if ($error = $this->validate_url_domain($data['return_url'])) {
+            $data['error_message'] = $error;
+            return $data;
+        }
+
+        // Verify password
+        $term_id = $this->get_term_id($data['original_post_id']);
+        $stored_hashed_password = $this->get_valid_password($term_id);
+
+        if ($this->verify_password($input_password, $stored_hashed_password)) {
+            $this->cookies->set_cookie($stored_hashed_password, $term_id);
+            wp_safe_redirect($data['return_url']);
+            exit;
+        } 
+        
+        $data['error_message'] = __('The password you entered is incorrect.', 'runthings-taxonomy-based-passwords');
+        return $data;
+    }
+
+    /**
+     * Process GET request for initial form load.
+     *
+     * @param array $data The initial data array.
+     * @return array Updated data array.
+     */
+    private function process_get_request(array $data): array
+    {
+        // Verify security nonce
+        if (!$this->verify_nonce($_GET, '_wpnonce', 'runthings_taxonomy_based_passwords_login_redirect')) {
+            $data['error_message'] = __('Security verification failed. Please try accessing the protected content again.', 'runthings-taxonomy-based-passwords');
+            return $data;
+        }
+
+        // Sanitize input
+        $data['return_url'] = esc_url_raw(wp_unslash($_GET['return_url']));
+        $data['original_post_id'] = (int)$_GET['original_post_id'];
+
+        // Validate URL domain
+        if ($error = $this->validate_url_domain($data['return_url'])) {
+            $data['error_message'] = $error;
+            return $data;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Verify nonce from request data.
+     *
+     * @param array  $source Source array ($_POST or $_GET).
+     * @param string $field  Nonce field name.
+     * @param string $action Nonce action.
+     * @return bool Whether the nonce is valid.
+     */
+    private function verify_nonce(array $source, string $field, string $action): bool
+    {
+        return isset($source[$field]) && wp_verify_nonce(sanitize_key(wp_unslash($source[$field])), $action);
+    }
+
+    /**
+     * Validate that URL domain matches the site domain.
+     *
+     * @param string $url URL to validate.
+     * @return string|null Error message or null if valid.
+     */
+    private function validate_url_domain(string $url): ?string
+    {
+        $url_host = wp_parse_url($url, PHP_URL_HOST);
+        $site_host = wp_parse_url(home_url(), PHP_URL_HOST);
+        
+        if ($url_host !== $site_host) {
+            return __('Invalid return URL.', 'runthings-taxonomy-based-passwords');
+        }
+        
+        return null;
+    }
+
+    private function render_login_form(array $data): string
+    {
         $aria = '';
         $form_class = 'post-password-form runthings-taxonomy-based-passwords-login-form';
 
-        if (! empty($error_message)) {
+        if (!empty($data['error_message'])) {
             $form_class .= ' password-form-error';
-            $aria = ' aria-describedby="error-' . esc_attr($field_id) . '"';
+            $aria = ' aria-describedby="error-' . esc_attr($data['field_id']) . '"';
         }
 
-        // Build the form
         $output = '<form method="post" class="' . esc_attr($form_class) . '">';
+        $output .= '<div class="runthings-taxonomy-based-passwords-restricted-content">';
         $output .= '<p>' . esc_html__('This content is restricted. Please enter your password to view it.', 'runthings-taxonomy-based-passwords') . '</p>';
+        $output .= '</div>';
 
-        // Error message if any
-        if (! empty($error_message)) {
+        if (!empty($data['error_message'])) {
             $output .= '<div class="runthings-taxonomy-based-passwords-error" role="alert">';
-            $output .= '<p id="error-' . esc_attr($field_id) . '">' . esc_html($error_message) . '</p>';
+            $output .= '<p id="error-' . esc_attr($data['field_id']) . '">' . esc_html($data['error_message']) . '</p>';
             $output .= '</div>';
         }
 
-        // Password field
         $output .= '<p>';
-        $output .= '<label for="' . esc_attr($field_id) . '">' . esc_html__('Password:', 'runthings-taxonomy-based-passwords') . ' ';
-        $output .= '<input name="post_password" id="' . esc_attr($field_id) . '" type="password" spellcheck="false" required size="20"' . $aria . ' />';
+        $output .= '<label for="' . esc_attr($data['field_id']) . '">' . esc_html__('Password:', 'runthings-taxonomy-based-passwords') . ' ';
+        $output .= '<input name="post_password" id="' . esc_attr($data['field_id']) . '" type="password" spellcheck="false" required size="20"' . $aria . ' />';
         $output .= '</label> ';
         $output .= '<input type="submit" name="Submit" value="' . esc_attr__('Enter', 'runthings-taxonomy-based-passwords') . '" />';
         $output .= '</p>';
 
-        // Hidden fields
-        $output .= '<input type="hidden" name="return_url" value="' . esc_attr($return_url) . '">';
-        $output .= '<input type="hidden" name="original_post_id" value="' . esc_attr($original_post_id) . '">';
+        $output .= '<input type="hidden" name="return_url" value="' . esc_attr($data['return_url']) . '">';
+        $output .= '<input type="hidden" name="original_post_id" value="' . esc_attr($data['original_post_id']) . '">';
         $output .= '<input type="hidden" name="runthings_taxonomy_based_password_form" value="login_form">';
-
-        // Security nonce
         $output .= wp_nonce_field('runthings_taxonomy_based_passwords_form', '_wpnonce', true, false);
-
         $output .= '</form>';
 
         return $output;
@@ -210,19 +261,14 @@ class Authentication
      */
     public function handle_logout(): void
     {
-        if (! isset($_GET['runthings_taxonomy_logout'])) {
+        if (!isset($_GET['runthings_taxonomy_logout'])) {
             return;
         }
 
-        if (
-            ! isset($_GET['_wpnonce']) ||
-            ! wp_verify_nonce(sanitize_key(wp_unslash($_GET['_wpnonce'])), 'runthings_taxonomy_based_passwords_logout')
-        ) {
-            wp_safe_redirect(home_url());
-            exit;
+        if ($this->verify_nonce($_GET, '_wpnonce', 'runthings_taxonomy_based_passwords_logout')) {
+            $this->cookies->clear_cookie();
         }
 
-        $this->cookies->clear_cookie();
         wp_safe_redirect(home_url());
         exit;
     }
