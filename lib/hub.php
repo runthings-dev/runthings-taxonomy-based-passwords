@@ -44,10 +44,10 @@ class Hub
                 $html .= '<li><a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a></li>';
             }
             $html .= '</ul>';
-            wp_reset_postdata();
-            return $html;
         }
+        
+        wp_reset_postdata();
 
-        return '';
+        return isset($html) ? $html : '';
     }
 }
