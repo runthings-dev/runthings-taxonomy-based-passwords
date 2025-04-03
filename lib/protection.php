@@ -5,6 +5,7 @@ namespace RunthingsTaxonomyBasedPasswords;
 class Protection
 {
     private Config $config;
+
     private Cookies $cookies;
 
     public function __construct(Config $config)
@@ -12,8 +13,8 @@ class Protection
         $this->config = $config;
         $this->cookies = new Cookies();
 
-        add_action('wp', [$this, 'single_protection']);
-        add_action('wp', [$this, 'archive_protection']);
+        add_action('template_redirect', [$this, 'single_protection']);
+        add_action('template_redirect', [$this, 'archive_protection']);
 
         add_shortcode($this->config->shortcode_current_term_id, [$this, 'render_current_term_id']);
         add_shortcode($this->config->shortcode_current_user_access_group_name, [$this, 'render_current_user_access_group_name']);
@@ -56,11 +57,11 @@ class Protection
      */
     public function single_protection(): void
     {
-        if ($this->is_bypassable_request()) {
+        if (!is_singular()) {
             return;
         }
 
-        if (!is_singular()) {
+        if ($this->is_bypassable_request()) {
             return;
         }
 
@@ -76,11 +77,11 @@ class Protection
      */
     public function archive_protection(): void
     {
-        if ($this->is_bypassable_request()) {
+        if (!is_archive()) {
             return;
         }
 
-        if (!is_archive()) {
+        if ($this->is_bypassable_request()) {
             return;
         }
 
@@ -236,13 +237,13 @@ class Protection
                 return true;
             }
 
-            // reason - not processing data, and its not our form to inject the nonce into
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-            if (!empty($_GET['elementor-preview']) && absint(wp_unslash($_GET['elementor-preview']))) {
-                $required_cap = apply_filters('runthings_tbp_required_bypass_elementor_cap', 'edit_posts');
+            // // reason - not processing data, and its not our form to inject the nonce into
+            // // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            // if (!empty($_GET['elementor-preview']) && absint(wp_unslash($_GET['elementor-preview']))) {
+            //     $required_cap = apply_filters('runthings_tbp_required_bypass_elementor_cap', 'edit_posts');
 
-                return current_user_can($required_cap);
-            }
+            //     return current_user_can($required_cap);
+            // }
         }
 
         $allow_bypass = defined('DOING_AJAX') && DOING_AJAX && is_user_logged_in();
