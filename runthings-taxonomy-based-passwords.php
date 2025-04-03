@@ -54,6 +54,7 @@ require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/taxonomy.php';
 class Runthings_Taxonomy_Based_Passwords
 {
     private static ?Runthings_Taxonomy_Based_Passwords $instance = null;
+
     private Config $config;
 
     private function __construct()
