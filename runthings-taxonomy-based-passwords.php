@@ -50,6 +50,7 @@ require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/cache.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/hub.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/protection.php';
 require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/taxonomy.php';
+require_once RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR . 'lib/taxonomy-term.php';
 
 class Runthings_Taxonomy_Based_Passwords
 {
@@ -68,6 +69,7 @@ class Runthings_Taxonomy_Based_Passwords
         new Hub($this->config);
         new Protection($this->config);
         new Taxonomy($this->config);
+        new TaxonomyTerm($this->config);
 
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
         add_action('admin_notices', [$this, 'check_login_page_set']);
