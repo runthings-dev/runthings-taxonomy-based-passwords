@@ -10,15 +10,25 @@ class TaxonomyTerm
     {
         $this->config = $config;
 
-        // Actions for meta boxes
+        // Meta box for selecting the access group
         add_action('add_meta_boxes', [$this, 'add_access_group_meta_boxes']);
         add_action('save_post', [$this, 'save_access_group_meta_box']);
 
-        // Customize admin columns titles
+        // Custom admin column / quick edit for cpts
         foreach ($this->config->objects as $post_type) {
             add_filter("manage_edit-{$post_type}_columns", [$this, 'edit_taxonomy_column_title']);
+            
+            // Quick edit support
+            add_action("quick_edit_custom_box", [$this, 'add_quick_edit_field'], 10, 2);
         }
+        
+        // Custom admin column / quick edit for hub object
         add_filter("manage_edit-{$this->config->hub_object}_columns", [$this, 'edit_taxonomy_column_title']);
+        add_action("quick_edit_custom_box", [$this, 'add_quick_edit_field'], 10, 2);
+
+        // Manage quick edit data
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_quick_edit_scripts']);
+        add_action('save_post', [$this, 'save_quick_edit_data']);
     }
 
     /**
@@ -140,5 +150,123 @@ class TaxonomyTerm
             $columns["taxonomy-{$this->config->taxonomy}"] = esc_html($this->config->taxonomy_singular);
         }
         return $columns;
+    }
+    
+    /**
+     * Add custom field to quick edit interface
+     */
+    public function add_quick_edit_field($column_name, $post_type): void
+    {
+        // Only process for our specific taxonomy column and relevant post types
+        if ($column_name !== "taxonomy-{$this->config->taxonomy}") {
+            return;
+        }
+        
+        if (!in_array($post_type, $this->config->objects) && $post_type !== $this->config->hub_object) {
+            return;
+        }
+        
+        $terms = get_terms([
+            'taxonomy' => $this->config->taxonomy,
+            'hide_empty' => false,
+            'orderby' => 'name',
+            'order' => 'ASC'
+        ]);
+        
+        if (empty($terms)) {
+            return;
+        }
+
+        ?>
+        <fieldset class="inline-edit-col-right" style="margin-top: 0;">
+            <div class="inline-edit-col">
+                <label class="inline-edit-group">
+                    <span class="title"><?php echo esc_html($this->config->taxonomy_singular); ?></span>
+                    <select name="access_group_term" id="access_group_term_quick_edit">
+                        <option value=""><?php 
+                            printf(
+                                esc_html__('Select %s', 'runthings-taxonomy-based-passwords'),
+                                esc_html($this->config->taxonomy_singular)
+                            ); 
+                        ?></option>
+                        <?php foreach ($terms as $term) : ?>
+                            <option value="<?php echo esc_attr($term->term_id); ?>" data-slug="<?php echo esc_attr($term->slug); ?>" data-name="<?php echo esc_attr($term->name); ?>">
+                                <?php echo esc_html($term->name); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+            </div>
+        </fieldset>
+        <?php
+    }
+    
+    /**
+     * Enqueue scripts for quick edit functionality
+     */
+    public function enqueue_quick_edit_scripts($hook): void
+    {
+        if ('edit.php' !== $hook) {
+            return;
+        }
+        
+        $current_screen = get_current_screen();
+        if (!$current_screen) {
+            return;
+        }
+        
+        if (!in_array($current_screen->post_type, $this->config->objects) && 
+            $current_screen->post_type !== $this->config->hub_object) {
+            return;
+        }
+        
+        wp_enqueue_script(
+            'runthings-tbp-quick-edit',
+            RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL . 'assets/js/quick-edit.js',
+            ['jquery', 'inline-edit-post'],
+            RUNTHINGS_TAXONOMY_BASED_PASSWORDS_VERSION,
+            true
+        );
+        
+        wp_localize_script('runthings-tbp-quick-edit', 'RunthingsTBP', [
+            'taxonomy' => $this->config->taxonomy,
+        ]);
+    }
+    
+    /**
+     * Save quick edit data
+     */
+    public function save_quick_edit_data(int $post_id): void
+    {
+        // Skip if autosaving
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+        
+        // Check permissions
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+        
+        $post = get_post($post_id);
+        
+        // Check if it's a relevant post type
+        if (!in_array($post->post_type, $this->config->objects) && 
+            !($post->post_type === $this->config->hub_object && $this->is_child_of_hub_object($post))) {
+            return;
+        }
+        
+        // Only process from quick edit submissions
+        if (isset($_POST['_inline_edit']) && wp_verify_nonce(sanitize_key(wp_unslash($_POST['_inline_edit'])), 'inlineeditnonce')) {
+            // Process the access group term if present
+            if (isset($_POST['access_group_term'])) {
+                $term_id = intval(wp_unslash($_POST['access_group_term']));
+                if ($term_id) {
+                    wp_set_post_terms($post_id, [$term_id], $this->config->taxonomy);
+                } else {
+                    wp_set_post_terms($post_id, [], $this->config->taxonomy);
+                }
+            }
+        }
     }
 }

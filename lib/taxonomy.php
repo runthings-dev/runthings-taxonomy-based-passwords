@@ -85,6 +85,7 @@ class Taxonomy
             'public' => false,
             'show_ui' => true,
             'show_admin_column' => true,
+            'show_in_quick_edit' => false,
             'hierarchical' => false,
             'rewrite' => ['slug' => $this->config->taxonomy_slug],
         ];
