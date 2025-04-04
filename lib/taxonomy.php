@@ -38,19 +38,19 @@ class Taxonomy
     public function register_access_group_taxonomy(): void
     {
         $labels = [
-            'name'              => esc_html($this->config->taxonomy_plural),
-            'singular_name'     => esc_html($this->config->taxonomy_singular),
-            'search_items'      => sprintf(
+            'name' => esc_html($this->config->taxonomy_plural),
+            'singular_name' => esc_html($this->config->taxonomy_singular),
+            'search_items' => sprintf(
                 /* translators: %s is the plural name of the taxonomy */
                 __('Search %s', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_plural
             ),
-            'all_items'         => sprintf(
+            'all_items' => sprintf(
                 /* translators: %s is the plural name of the taxonomy */
                 __('All %s', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_plural
             ),
-            'parent_item'       => sprintf(
+            'parent_item' => sprintf(
                 /* translators: %s is the singular name of the taxonomy */
                 __('Parent %s', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
@@ -60,36 +60,36 @@ class Taxonomy
                 __('Parent %s:', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
             ),
-            'edit_item'         => sprintf(
+            'edit_item' => sprintf(
                 /* translators: %s is the singular name of the taxonomy */
                 __('Edit %s', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
             ),
-            'update_item'       => sprintf(
+            'update_item' => sprintf(
                 /* translators: %s is the singular name of the taxonomy */
                 __('Update %s', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
             ),
-            'add_new_item'      => sprintf(
+            'add_new_item' => sprintf(
                 /* translators: %s is the singular name of the taxonomy */
                 __('Add New %s', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
             ),
-            'new_item_name'     => sprintf(
+            'new_item_name' => sprintf(
                 /* translators: %s is the singular name of the taxonomy */
                 __('New %s Name', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
             ),
-            'menu_name'         => esc_html($this->config->taxonomy_plural),
+            'menu_name' => esc_html($this->config->taxonomy_plural),
         ];
 
         $args = [
-            'labels'            => $labels,
-            'public'            => false,
-            'show_ui'           => true,
+            'labels' => $labels,
+            'public' => false,
+            'show_ui' => true,
             'show_admin_column' => true,
-            'hierarchical'      => false,
-            'rewrite'           => ['slug' => $this->config->taxonomy_slug],
+            'hierarchical' => false,
+            'rewrite' => ['slug' => $this->config->taxonomy_slug],
         ];
 
         $taxonomy_objects = array_merge($this->config->objects, [$this->config->hub_object]);
