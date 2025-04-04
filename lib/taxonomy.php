@@ -80,6 +80,11 @@ class Taxonomy
                 __('New %s Name', 'runthings-taxonomy-based-passwords'),
                 $this->config->taxonomy_singular
             ),
+            'back_to_items' => sprintf(
+                /* translators: %s is the plural name of the taxonomy */
+                __('Back to %s', 'runthings-taxonomy-based-passwords'),
+                $this->config->taxonomy_plural
+            ),
             'menu_name' => esc_html($this->config->taxonomy_plural),
         ];
 
