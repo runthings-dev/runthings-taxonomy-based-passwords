@@ -4,7 +4,7 @@
  * Plugin Name: Taxonomy-Based Passwords
  * Plugin URI: https://runthings.dev
  * Description: A plugin to implement password protection based on taxonomy terms.
- * Version: 0.5.0
+ * Version: 0.6.0
  * Author: runthingsdev
  * Author URI: https://runthings.dev/
  * Requires PHP: 7.4
@@ -35,7 +35,7 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_VERSION', '0.5.0');
+define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_VERSION', '0.6.0');
 define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_URL', plugin_dir_url(__FILE__));
 define('RUNTHINGS_TAXONOMY_BASED_PASSWORDS_DIR', plugin_dir_path(__FILE__));
 
